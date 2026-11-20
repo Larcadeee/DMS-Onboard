@@ -3,7 +3,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDateTime, titleCase } from "@/lib/format";
-import { Badge, Card, EmptyState, LoadingSkeleton, PageHeader, StatCard } from "@/components/ui/Primitives";
+import { Badge, Card, ErrorState, PageHeader, PageLoading, StatCard } from "@/components/ui/Primitives";
 import { DataTable } from "@/components/ui/DataTable";
 
 interface Record {
@@ -32,21 +32,20 @@ export default function TraineeAttendancePage() {
           breadcrumb="My Onboarding"
         />
 
-        {loading && <LoadingSkeleton rows={4} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading your attendance" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
               <StatCard title="Attendance Rate" value={`${rate}%`} />
-              <StatCard title="Present" value={data.summary.present} tone="emerald" />
-              <StatCard title="Late" value={data.summary.late} tone="sky" />
-              <StatCard title="Excused" value={data.summary.excused} tone="amber" />
-              <StatCard title="Absent" value={data.summary.absent} tone="red" />
+              <StatCard title="Present" value={data.summary.present} tone="accent" />
+              <StatCard title="Late" value={data.summary.late} tone="default" />
+              <StatCard title="Excused" value={data.summary.excused} tone="warning" />
+              <StatCard title="Absent" value={data.summary.absent} tone="danger" />
             </div>
 
             <Card title="Attendance Records">
-              {data.attendance.length === 0 && <EmptyState title="No attendance records" description="Records appear after your trainer marks attendance for a session." />}
               <DataTable
                 rows={data.attendance}
                 loading={false}

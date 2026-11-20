@@ -31,7 +31,7 @@ export function DataTable<T>({
   emptyAction?: ReactNode;
   keyField?: string;
 }) {
-  if (loading) return <LoadingSkeleton />;
+  if (loading) return <LoadingSkeleton rows={6} />;
   if (error) return <ErrorState message={error} onRetry={onRetry} />;
 
   if (rows.length === 0) {
@@ -39,22 +39,32 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="-mx-5 overflow-x-auto px-5">
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
+    <div className="content-enter -mx-5 overflow-x-auto px-5" aria-live="polite">
+      <table className="min-w-full border-separate border-spacing-0 text-sm">
         <thead>
           <tr className="text-left">
             {columns.map((column) => (
-              <th key={column.key} className={`whitespace-nowrap pb-2 pr-4 text-xs font-semibold uppercase tracking-wide text-slate-400 ${column.className ?? ""}`}>
+              <th
+                key={column.key}
+                scope="col"
+                className={`whitespace-nowrap border-b border-line pb-2.5 pr-4 text-[11px] font-semibold uppercase tracking-[0.06em] text-muted ${column.className ?? ""}`}
+              >
                 {column.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody>
           {rows.map((row, index) => (
-            <tr key={String((row as Record<string, unknown>)[keyField] ?? index)} className="hover:bg-slate-50/60">
+            <tr
+              key={String((row as Record<string, unknown>)[keyField] ?? index)}
+              className="group transition-colors hover:bg-canvas"
+            >
               {columns.map((column) => (
-                <td key={column.key} className={`whitespace-nowrap py-3 pr-4 align-middle text-slate-700 ${column.className ?? ""}`}>
+                <td
+                  key={column.key}
+                  className={`whitespace-nowrap border-b border-line/70 py-3 pr-4 align-middle text-[13px] text-ink-soft group-last:border-b-0 ${column.className ?? ""}`}
+                >
                   {column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? "—")}
                 </td>
               ))}

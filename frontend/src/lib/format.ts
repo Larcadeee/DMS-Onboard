@@ -19,6 +19,7 @@ export interface AuthUser {
   trainee_id: number | null;
   must_change_password: boolean;
   is_active: boolean;
+  account_status?: "PENDING" | "ACTIVE" | "REJECTED" | "INACTIVE";
   last_login_at?: string | null;
   unread_notifications: number;
 }

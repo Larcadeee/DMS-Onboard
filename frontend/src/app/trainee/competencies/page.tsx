@@ -3,7 +3,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDate, titleCase } from "@/lib/format";
-import { Badge, Card, EmptyState, LoadingSkeleton, PageHeader, StatCard } from "@/components/ui/Primitives";
+import { Badge, Card, EmptyState, ErrorState, PageHeader, PageLoading, StatCard } from "@/components/ui/Primitives";
 
 interface Evaluation {
   id: number;
@@ -26,7 +26,7 @@ interface Evaluation {
 }
 
 export default function TraineeCompetenciesPage() {
-  const { data, loading, error } = useApi<{ evaluations: Evaluation[] }>("/api/v1/my/competencies");
+  const { data, loading, error, refetch } = useApi<{ evaluations: Evaluation[] }>("/api/v1/my/competencies");
   const evaluations = data?.evaluations ?? [];
 
   return (
@@ -38,16 +38,16 @@ export default function TraineeCompetenciesPage() {
           breadcrumb="My Onboarding"
         />
 
-        {loading && <LoadingSkeleton rows={4} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading competency evaluations" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <StatCard title="Total Evaluations" value={evaluations.length} />
-              <StatCard title="Competent" value={evaluations.filter((evaluation) => ["competent", "validated"].includes(evaluation.status)).length} tone="emerald" />
-              <StatCard title="Validated" value={evaluations.filter((evaluation) => evaluation.status === "validated").length} tone="sky" />
-              <StatCard title="Needs Improvement" value={evaluations.filter((evaluation) => evaluation.status === "needs_improvement").length} tone="amber" />
+              <StatCard title="Competent" value={evaluations.filter((evaluation) => ["competent", "validated"].includes(evaluation.status)).length} tone="accent" />
+              <StatCard title="Validated" value={evaluations.filter((evaluation) => evaluation.status === "validated").length} tone="default" />
+              <StatCard title="Needs Improvement" value={evaluations.filter((evaluation) => evaluation.status === "needs_improvement").length} tone="warning" />
             </div>
 
             {evaluations.length === 0 && <Card><EmptyState title="No competency evaluations yet" description="Your trainer will record competency observations during practical sessions." /></Card>}
@@ -70,7 +70,7 @@ export default function TraineeCompetenciesPage() {
                       </p>
                     </div>
                     {evaluation.status === "validated" && evaluation.validated_at && (
-                      <p className="text-xs text-emerald-600">Validated {formatDate(evaluation.validated_at)}{evaluation.validator?.name ? ` by ${evaluation.validator.name}` : ""}</p>
+                      <p className="text-xs text-brand-dark">Validated {formatDate(evaluation.validated_at)}{evaluation.validator?.name ? ` by ${evaluation.validator.name}` : ""}</p>
                     )}
                   </div>
 

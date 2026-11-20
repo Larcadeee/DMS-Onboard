@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { isTrainee } from "@/lib/format";
+import { Spinner } from "@/components/ui/Primitives";
 
 const personalPaths = ["/trainee", "/notifications", "/profile", "/change-password"];
 
@@ -38,8 +39,11 @@ export default function AuthGuard({
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-slate-500">
-        Verifying account...
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-4" role="status" aria-live="polite">
+        <div className="flex items-center gap-3 rounded-md border border-line bg-surface px-4 py-3 text-sm text-muted">
+          <Spinner className="h-4 w-4 text-brand" />
+          Verifying your session
+        </div>
       </div>
     );
   }

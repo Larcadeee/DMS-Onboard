@@ -5,7 +5,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { downloadFile, query } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { formatDate, formatDateTime, titleCase } from "@/lib/format";
-import { Badge, Button, Card, Input, PageHeader, ProgressBar, StatCard, Tabs } from "@/components/ui/Primitives";
+import { Badge, Button, Card, ErrorState, Input, PageHeader, PageLoading, ProgressBar, StatCard, Tabs } from "@/components/ui/Primitives";
 import { DataTable } from "@/components/ui/DataTable";
 
 interface Overview {
@@ -69,8 +69,8 @@ export default function ReportsPage() {
           breadcrumb="Reporting"
           actions={
             <>
-              <Button variant="secondary" onClick={() => exportCsv("progress")} disabled={exporting}>Export Progress CSV</Button>
-              <Button variant="secondary" onClick={() => exportCsv("attendance")} disabled={exporting}>Export Attendance CSV</Button>
+              <Button variant="secondary" onClick={() => exportCsv("progress")} loading={exporting}>Export progress CSV</Button>
+              <Button variant="secondary" onClick={() => exportCsv("attendance")} disabled={exporting}>Export attendance CSV</Button>
             </>
           }
         />
@@ -100,16 +100,19 @@ export default function ReportsPage() {
           onChange={setTab}
         />
 
-        {tab === "overview" && (
+        {tab === "overview" && overview.loading && <PageLoading label="Loading report overview" />}
+        {tab === "overview" && overview.error && <ErrorState message={overview.error} onRetry={overview.refetch} />}
+
+        {tab === "overview" && overview.data && (
           <div className="space-y-5">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <StatCard title="Total Trainees" value={overview.data?.trainees.total ?? "—"} description={`${overview.data?.trainees.active ?? 0} active`} />
-              <StatCard title="Ongoing Onboarding" value={overview.data?.onboarding.ongoing ?? "—"} tone="sky" description={`${overview.data?.onboarding.total ?? 0} total enrollments`} />
-              <StatCard title="Completed Onboarding" value={overview.data?.onboarding.completed ?? "—"} tone="emerald" description={`${overview.data?.onboarding.on_hold ?? 0} on hold`} />
+              <StatCard title="Ongoing Onboarding" value={overview.data?.onboarding.ongoing ?? "—"} tone="default" description={`${overview.data?.onboarding.total ?? 0} total enrollments`} />
+              <StatCard title="Completed Onboarding" value={overview.data?.onboarding.completed ?? "—"} tone="accent" description={`${overview.data?.onboarding.on_hold ?? 0} on hold`} />
               <StatCard
                 title="Attendance Rate"
                 value={overview.data?.attendance.total ? `${Math.round((overview.data.attendance.present / overview.data.attendance.total) * 100)}%` : "—"}
-                tone="violet"
+                tone="default"
                 description={`${overview.data?.attendance.present ?? 0} present of ${overview.data?.attendance.total ?? 0}`}
               />
             </div>
@@ -117,8 +120,8 @@ export default function ReportsPage() {
             <div className="grid gap-4 lg:grid-cols-3">
               <Card title="Attendance Breakdown">
                 <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between"><dt>Present</dt><dd className="font-medium text-emerald-600">{overview.data?.attendance.present ?? 0}</dd></div>
-                  <div className="flex justify-between"><dt>Late</dt><dd className="font-medium text-sky-600">{overview.data?.attendance.late ?? 0}</dd></div>
+                  <div className="flex justify-between"><dt>Present</dt><dd className="font-medium text-brand-dark">{overview.data?.attendance.present ?? 0}</dd></div>
+                  <div className="flex justify-between"><dt>Late</dt><dd className="font-medium text-ink-soft">{overview.data?.attendance.late ?? 0}</dd></div>
                   <div className="flex justify-between"><dt>Excused</dt><dd className="font-medium text-amber-600">{overview.data?.attendance.excused ?? 0}</dd></div>
                   <div className="flex justify-between"><dt>Absent</dt><dd className="font-medium text-red-600">{overview.data?.attendance.absent ?? 0}</dd></div>
                 </dl>
@@ -127,7 +130,7 @@ export default function ReportsPage() {
               <Card title="Assessment Results">
                 <dl className="space-y-2 text-sm">
                   <div className="flex justify-between"><dt>Total attempts</dt><dd className="font-medium">{overview.data?.assessments.attempts ?? 0}</dd></div>
-                  <div className="flex justify-between"><dt>Passed</dt><dd className="font-medium text-emerald-600">{overview.data?.assessments.passed ?? 0}</dd></div>
+                  <div className="flex justify-between"><dt>Passed</dt><dd className="font-medium text-brand-dark">{overview.data?.assessments.passed ?? 0}</dd></div>
                   <div className="flex justify-between"><dt>Failed</dt><dd className="font-medium text-red-600">{overview.data?.assessments.failed ?? 0}</dd></div>
                   <div className="flex justify-between"><dt>Pass rate</dt><dd className="font-medium">{overview.data?.assessments.attempts ? `${Math.round(((overview.data.assessments.passed) / overview.data.assessments.attempts) * 100)}%` : "—"}</dd></div>
                 </dl>
@@ -135,8 +138,8 @@ export default function ReportsPage() {
 
               <Card title="Competency Status">
                 <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between"><dt>Competent</dt><dd className="font-medium text-emerald-600">{overview.data?.competencies.competent ?? 0}</dd></div>
-                  <div className="flex justify-between"><dt>Validated</dt><dd className="font-medium text-sky-600">{overview.data?.competencies.validated ?? 0}</dd></div>
+                  <div className="flex justify-between"><dt>Competent</dt><dd className="font-medium text-brand-dark">{overview.data?.competencies.competent ?? 0}</dd></div>
+                  <div className="flex justify-between"><dt>Validated</dt><dd className="font-medium text-ink-soft">{overview.data?.competencies.validated ?? 0}</dd></div>
                   <div className="flex justify-between"><dt>Needs improvement</dt><dd className="font-medium text-amber-600">{overview.data?.competencies.needs_improvement ?? 0}</dd></div>
                 </dl>
                 <div className="mt-3 flex gap-2">

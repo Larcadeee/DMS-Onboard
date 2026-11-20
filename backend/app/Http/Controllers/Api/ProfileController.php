@@ -147,6 +147,7 @@ class ProfileController extends Controller
             'trainee_id' => $user->trainee?->id,
             'must_change_password' => $user->must_change_password,
             'is_active' => $user->is_active,
+            'account_status' => $user->account_status,
             'last_login_at' => $user->last_login_at,
         ];
     }

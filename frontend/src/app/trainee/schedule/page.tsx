@@ -4,7 +4,7 @@ import { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDate, formatDateTime, formatTime, titleCase } from "@/lib/format";
-import { Badge, Card, EmptyState, LoadingSkeleton, PageHeader, StatCard } from "@/components/ui/Primitives";
+import { Badge, Card, EmptyState, ErrorState, PageHeader, PageLoading, StatCard } from "@/components/ui/Primitives";
 
 interface Session {
   id: number;
@@ -25,7 +25,7 @@ interface Attendance {
 }
 
 export default function TraineeSchedulePage() {
-  const { data, loading, error } = useApi<{ sessions: Session[]; attendance: Attendance[] }>("/api/v1/my/schedule");
+  const { data, loading, error, refetch } = useApi<{ sessions: Session[]; attendance: Attendance[] }>("/api/v1/my/schedule");
 
   const attendanceBySession = new Map((data?.attendance ?? []).map((record) => [record.training_session_id, record]));
   const [now] = useState(() => Date.now());
@@ -41,14 +41,14 @@ export default function TraineeSchedulePage() {
           breadcrumb="My Onboarding"
         />
 
-        {loading && <LoadingSkeleton rows={4} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading your schedule" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
-              <StatCard title="Upcoming Sessions" value={upcoming.length} tone="sky" />
-              <StatCard title="Completed Sessions" value={past.length} tone="emerald" />
+              <StatCard title="Upcoming Sessions" value={upcoming.length} tone="default" />
+              <StatCard title="Completed Sessions" value={past.length} tone="accent" />
               <StatCard title="Next Session" value={upcoming[0] ? formatDate(upcoming[0].starts_at) : "—"} />
             </div>
 

@@ -5,7 +5,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { api } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { useToast } from "@/components/ui/Toast";
-import { Button, Card, Field, Input, PageHeader, Select, StatCard, Tabs } from "@/components/ui/Primitives";
+import { Button, Card, ErrorState, Field, Input, PageHeader, PageLoading, Select, StatCard, Tabs } from "@/components/ui/Primitives";
 import { titleCase } from "@/lib/format";
 
 interface Setting { id: number; key: string; group: string; value: unknown }
@@ -70,20 +70,22 @@ export default function SettingsPage() {
           title="System Settings"
           description="Configure onboarding thresholds, file uploads and notification behavior."
           breadcrumb="Administration"
-          actions={<Button onClick={save} disabled={saving || loading}>{saving ? "Saving..." : "Save Settings"}</Button>}
+          actions={<Button onClick={save} loading={saving} disabled={loading}>{saving ? "Saving settings" : "Save settings"}</Button>}
         />
 
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading settings" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
-        <Tabs
-          tabs={groups.map((group) => ({ value: group, label: titleCase(group) }))}
-          value={tab}
-          onChange={setTab}
-        />
+        {!loading && !error && (
+          <>
+            <Tabs
+              tabs={groups.map((group) => ({ value: group, label: titleCase(group) }))}
+              value={tab}
+              onChange={setTab}
+            />
 
-        <Card>
-          {loading && <p className="text-sm text-slate-500">Loading settings...</p>}
-          <div className="grid gap-5 sm:grid-cols-2">
+            <Card>
+              <div className="grid gap-5 sm:grid-cols-2">
             {visible.map((setting) => {
               const value = values[setting.key];
 
@@ -118,14 +120,16 @@ export default function SettingsPage() {
                 </Field>
               );
             })}
-          </div>
-        </Card>
+              </div>
+            </Card>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <StatCard title="Configured settings" value={data?.settings.length ?? "—"} />
-          <StatCard title="Timezone" value={String(values.time_zone ?? "—")} tone="sky" />
-          <StatCard title="Attendance threshold" value={`${values.attendance_threshold ?? "—"}%`} tone="emerald" />
-        </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <StatCard title="Configured settings" value={data?.settings.length ?? "—"} />
+              <StatCard title="Timezone" value={String(values.time_zone ?? "—")} />
+              <StatCard title="Attendance threshold" value={`${values.attendance_threshold ?? "—"}%`} tone="accent" />
+            </div>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );

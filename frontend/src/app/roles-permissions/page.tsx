@@ -6,7 +6,7 @@ import { api } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/lib/auth";
-import { Badge, Button, Card, Field, Input, Modal, PageHeader, SectionTitle, Textarea } from "@/components/ui/Primitives";
+import { Badge, Button, Card, ErrorState, Field, Input, Modal, PageHeader, PageLoading, SectionTitle, Textarea } from "@/components/ui/Primitives";
 
 interface Permission { id: number; name: string; slug: string; module?: string; description?: string }
 interface Role {
@@ -116,21 +116,23 @@ export default function RolesPage() {
           actions={can("roles.manage") ? <Button onClick={() => setOpen(true)}>Add Role</Button> : undefined}
         />
 
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading roles and permissions" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
-        <div className="grid gap-4 lg:grid-cols-4">
+        {!loading && !error && (
+          <>
+            <div className="grid gap-4 lg:grid-cols-4">
           <Card title="Roles" className="lg:col-span-1">
-            {loading && <p className="text-sm text-slate-500">Loading roles...</p>}
             <div className="space-y-1">
               {roles.map((role) => (
                 <button
                   key={role.id}
                   type="button"
                   onClick={() => setSelectedId(role.id)}
-                  className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${selected?.id === role.id ? "bg-slate-900 text-white" : "hover:bg-slate-100"}`}
+                  className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${selected?.id === role.id ? "bg-ink text-white" : "hover:bg-canvas"}`}
                 >
                   <span className="block font-medium">{role.name}</span>
-                  <span className={`text-xs ${selected?.id === role.id ? "text-slate-300" : "text-slate-400"}`}>{role.users_count ?? 0} user{(role.users_count ?? 0) === 1 ? "" : "s"}</span>
+                  <span className={`text-[11px] ${selected?.id === role.id ? "text-white/60" : "text-muted"}`}>{role.users_count ?? 0} user{(role.users_count ?? 0) === 1 ? "" : "s"}</span>
                 </button>
               ))}
             </div>
@@ -138,7 +140,7 @@ export default function RolesPage() {
 
           <Card className="lg:col-span-3" title={selected ? `${selected.name} Permissions` : "Permissions"}
             description={selected?.description ?? "Select the capabilities available to this role."}
-            actions={selected && <Button onClick={save} disabled={saving}>{saving ? "Saving..." : "Save Permissions"}</Button>}
+            actions={selected && <Button onClick={save} loading={saving}>{saving ? "Saving permissions" : "Save permissions"}</Button>}
           >
             {!selected && <p className="text-sm text-slate-500">Select a role to configure permissions.</p>}
             <div className="space-y-6">
@@ -168,9 +170,9 @@ export default function RolesPage() {
               })}
             </div>
           </Card>
-        </div>
+            </div>
 
-        <Card title="Role Summary">
+            <Card title="Role Summary">
           <div className="flex flex-wrap gap-3">
             {roles.map((role) => (
               <div key={role.id} className="rounded-lg border p-3 text-sm">
@@ -178,15 +180,17 @@ export default function RolesPage() {
                 <p className="text-xs text-slate-500">{role.permissions.length} permissions · {role.users_count ?? 0} users</p>
               </div>
             ))}
-          </div>
-        </Card>
+              </div>
+            </Card>
+          </>
+        )}
       </div>
 
       <Modal open={open} title="Add Role" onClose={() => setOpen(false)}
-        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="role-form" disabled={creating}>{creating ? "Creating..." : "Create Role"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="role-form" loading={creating}>{creating ? "Creating role" : "Create role"}</Button></>}
       >
         <form id="role-form" onSubmit={createRole} className="space-y-4">
-          {formError && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{formError}</p>}
+          {formError && <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{formError}</p>}
           <Field label="Role Name" required><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Training Coordinator" /></Field>
           <Field label="Slug" required hint="Lowercase identifier used by the system, e.g. training_coordinator.">
             <Input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />

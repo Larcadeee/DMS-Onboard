@@ -53,7 +53,9 @@ $permissions = [
     'users.view' => 'View Users',
     'users.create' => 'Create Users',
     'users.update' => 'Update Users',
+    'users.approve' => 'Approve or Reject Registrations',
     'users.deactivate' => 'Deactivate Users',
+    'users.delete' => 'Delete Users',
     'roles.manage' => 'Manage Roles and Permissions',
 
     // Trainees

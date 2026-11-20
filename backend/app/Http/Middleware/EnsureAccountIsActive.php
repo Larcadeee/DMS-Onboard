@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountIsActive
@@ -18,8 +19,7 @@ class EnsureAccountIsActive
             ], 401);
         }
 
-        if (!$user->is_active) {
-
+        if (!$user->isActiveStatus()) {
             // Revoke the current Sanctum API token, if applicable.
             $token = $user->currentAccessToken();
 
@@ -27,8 +27,18 @@ class EnsureAccountIsActive
                 $token->delete();
             }
 
+            // Terminate the browser session so the blocked account cannot
+            // continue to reuse an established cookie session.
+            Auth::guard('web')->logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
             return response()->json([
-                'message' => 'Your account is inactive. Contact the system administrator.',
+                'message' => $user->statusMessage(),
+                'account_status' => $user->account_status,
             ], 403);
         }
 

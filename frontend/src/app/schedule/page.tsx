@@ -177,10 +177,10 @@ export default function SchedulePage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="Today's Sessions" value={summary.data?.today ?? "—"} />
-          <StatCard title="Upcoming Sessions" value={summary.data?.upcoming ?? "—"} tone="sky" />
-          <StatCard title="Completed Sessions" value={summary.data?.completed ?? "—"} tone="emerald" />
-          <StatCard title="Cancelled / Rescheduled" value={summary.data?.cancelled ?? "—"} tone="amber" />
+          <StatCard loading={summary.loading} title="Today's Sessions" value={summary.data?.today ?? "—"} />
+          <StatCard loading={summary.loading} title="Upcoming Sessions" value={summary.data?.upcoming ?? "—"} tone="default" />
+          <StatCard loading={summary.loading} title="Completed Sessions" value={summary.data?.completed ?? "—"} tone="accent" />
+          <StatCard loading={summary.loading} title="Cancelled / Rescheduled" value={summary.data?.cancelled ?? "—"} tone="warning" />
         </div>
 
         <Card title="Session Calendar" description={`${month.toLocaleDateString("en-PH", { month: "long", year: "numeric" })}`}
@@ -252,10 +252,10 @@ export default function SchedulePage() {
       </div>
 
       <Modal open={open} title={editing ? "Edit Training Session" : "Schedule Training Session"} onClose={() => setOpen(false)} wide
-        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="session-form" disabled={saving}>{saving ? "Saving..." : "Save Session"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="session-form" loading={saving}>{saving ? "Saving session" : "Save session"}</Button></>}
       >
         <form id="session-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {error && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{error}</p>}
           <Field label="Session Title" required><Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
           <Field label="Training Module" required>
             <Select required value={form.training_module_id} onChange={(e) => setForm({ ...form, training_module_id: e.target.value })}>

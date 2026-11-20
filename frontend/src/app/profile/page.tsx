@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { formatDateTime, type AuthUser } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
-import { Badge, Button, Card, DetailRow, Field, Input, PageHeader, StatCard } from "@/components/ui/Primitives";
+import { Badge, Button, Card, DetailRow, ErrorState, Field, Input, PageHeader, PageLoading, StatCard } from "@/components/ui/Primitives";
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png"];
@@ -145,18 +145,18 @@ export default function ProfilePage() {
           title="My Profile"
           description="Manage your personal information and profile photo."
           breadcrumb="Workspace"
-          actions={<Link href="/change-password" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Change Password</Link>}
+          actions={<Link href="/change-password"><Button variant="secondary">Change password</Button></Link>}
         />
 
-        {loading && <Card><p className="text-sm text-slate-500">Loading profile...</p></Card>}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading profile" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {profile && (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
               <StatCard title="Role" value={profile.role?.name ?? "—"} />
-              <StatCard title="Permissions" value={profile.permissions.length} tone="sky" />
-              <StatCard title="Unread Notifications" value={profile.unread_notifications} tone="violet" />
+              <StatCard title="Permissions" value={profile.permissions.length} tone="default" />
+              <StatCard title="Unread Notifications" value={profile.unread_notifications} tone="default" />
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
@@ -172,16 +172,16 @@ export default function ProfilePage() {
                   />
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button type="button" variant="secondary" size="sm" onClick={() => fileInput.current?.click()}>
-                      {profile.avatar_url || preview ? "Replace Photo" : "Upload Photo"}
+                      {profile.avatar_url || preview ? "Replace photo" : "Upload photo"}
                     </Button>
                     {profile.avatar_url && !photo && (
-                      <Button type="button" variant="ghost" size="sm" className="text-red-600" onClick={removePhoto} disabled={removing}>
-                        {removing ? "Removing..." : "Remove Photo"}
+                      <Button type="button" variant="ghost" size="sm" className="text-red-600" onClick={removePhoto} loading={removing}>
+                        {removing ? "Removing photo" : "Remove photo"}
                       </Button>
                     )}
                     {photo && (
                       <Button type="button" variant="ghost" size="sm" onClick={() => { setPhoto(null); if (fileInput.current) fileInput.current.value = ""; }}>
-                        Cancel Selection
+                        Cancel selection
                       </Button>
                     )}
                   </div>
@@ -192,7 +192,7 @@ export default function ProfilePage() {
               <Card title="Personal Information" className="lg:col-span-2">
                 <form onSubmit={save} className="space-y-4">
                   {(formError || success) && (
-                    <div className={`rounded-lg p-3 text-sm ${formError ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`} role="status">
+                    <div className={`rounded-md border px-3.5 py-2.5 text-xs leading-5 ${formError ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-brand-soft text-brand-dark"}`} role="status">
                       {formError || success}
                     </div>
                   )}
@@ -233,7 +233,7 @@ export default function ProfilePage() {
                     }); setPhoto(null); setFormError(""); setSuccess(""); }}>
                       Reset
                     </Button>
-                    <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</Button>
+                    <Button type="submit" loading={saving}>{saving ? "Saving changes" : "Save changes"}</Button>
                   </div>
                 </form>
               </Card>

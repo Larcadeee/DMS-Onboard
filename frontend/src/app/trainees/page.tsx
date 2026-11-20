@@ -156,11 +156,11 @@ export default function TraineesPage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <StatCard title="Total Trainees" value={summary.data?.total ?? "—"} />
-          <StatCard title="Active Trainees" value={summary.data?.active ?? "—"} tone="emerald" />
-          <StatCard title="Ongoing Training" value={summary.data?.ongoing ?? "—"} tone="sky" />
-          <StatCard title="Completed Training" value={summary.data?.completed ?? "—"} tone="violet" />
-          <StatCard title="Archived" value={summary.data?.archived ?? "—"} tone="amber" />
+          <StatCard loading={summary.loading} title="Total Trainees" value={summary.data?.total ?? "—"} />
+          <StatCard loading={summary.loading} title="Active Trainees" value={summary.data?.active ?? "—"} tone="accent" />
+          <StatCard loading={summary.loading} title="Ongoing Training" value={summary.data?.ongoing ?? "—"} tone="default" />
+          <StatCard loading={summary.loading} title="Completed Training" value={summary.data?.completed ?? "—"} tone="default" />
+          <StatCard loading={summary.loading} title="Archived" value={summary.data?.archived ?? "—"} tone="warning" />
         </div>
 
         <Card>
@@ -224,12 +224,12 @@ export default function TraineesPage() {
         footer={
           <>
             <Button variant="secondary" type="button" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" form="trainee-form" disabled={saving}>{saving ? "Saving..." : "Save Trainee"}</Button>
+            <Button type="submit" form="trainee-form" loading={saving}>{saving ? "Saving trainee" : "Save trainee"}</Button>
           </>
         }
       >
         <form id="trainee-form" onSubmit={save} className="space-y-6">
-          {formError && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{formError}</p>}
+          {formError && <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{formError}</p>}
 
           <section>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">Personal Information</h3>

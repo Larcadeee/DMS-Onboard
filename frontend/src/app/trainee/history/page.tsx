@@ -3,7 +3,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDate, titleCase } from "@/lib/format";
-import { Badge, Card, EmptyState, LoadingSkeleton, PageHeader, ProgressBar } from "@/components/ui/Primitives";
+import { Badge, Card, EmptyState, ErrorState, PageHeader, PageLoading, ProgressBar } from "@/components/ui/Primitives";
 
 interface HistoryItem {
   enrollment_id: number;
@@ -22,7 +22,7 @@ interface HistoryItem {
 }
 
 export default function TraineeHistoryPage() {
-  const { data, loading, error } = useApi<{ history: HistoryItem[] }>("/api/v1/my/history");
+  const { data, loading, error, refetch } = useApi<{ history: HistoryItem[] }>("/api/v1/my/history");
 
   return (
     <DashboardLayout>
@@ -33,8 +33,8 @@ export default function TraineeHistoryPage() {
           breadcrumb="My Onboarding"
         />
 
-        {loading && <LoadingSkeleton rows={3} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading training history" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && data.history.length === 0 && <Card><EmptyState title="No training history" description="Your onboarding enrollments will appear here." /></Card>}
 

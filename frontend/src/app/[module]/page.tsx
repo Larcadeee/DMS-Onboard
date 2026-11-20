@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { Card, PageHeader } from "@/components/ui/Primitives";
 
 const modules: Record<string, { title: string; description: string }> = {
   trainees: {
@@ -54,28 +55,14 @@ export default async function ModulePage({
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            {page.title}
-          </h1>
+      <div className="space-y-5">
+        <PageHeader title={page.title} description={page.description} breadcrumb="Module" />
 
-          <p className="mt-1 text-sm text-slate-500">
-            {page.description}
+        <Card title="Module initialization">
+          <p className="max-w-2xl text-sm leading-6 text-muted">
+            This module interface is being prepared. Its operational functions will be integrated in the next development stage.
           </p>
-        </div>
-
-        <div className="rounded-xl border bg-white p-8">
-          <h2 className="font-semibold text-slate-800">
-            Module initialization
-          </h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            This module interface is being prepared. Its database and
-            operational functions will be integrated in the next
-            development stage.
-          </p>
-        </div>
+        </Card>
       </div>
     </DashboardLayout>
   );

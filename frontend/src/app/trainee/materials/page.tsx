@@ -6,7 +6,7 @@ import { downloadFile } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate, titleCase } from "@/lib/format";
-import { Badge, Button, Card, EmptyState, Input, LoadingSkeleton, PageHeader } from "@/components/ui/Primitives";
+import { Badge, Button, Card, EmptyState, ErrorState, Input, LoadingSkeleton, PageHeader } from "@/components/ui/Primitives";
 
 interface Material {
   id: number;
@@ -27,7 +27,7 @@ export default function TraineeMaterialsPage() {
   const toast = useToast();
   const [search, setSearch] = useState("");
   const [downloading, setDownloading] = useState<number | null>(null);
-  const { data, loading, error } = useApi<{ materials: Material[] }>("/api/v1/my/materials");
+  const { data, loading, error, refetch } = useApi<{ materials: Material[] }>("/api/v1/my/materials");
 
   const materials = (data?.materials ?? []).filter((material) => {
     if (!search) return true;
@@ -68,12 +68,12 @@ export default function TraineeMaterialsPage() {
           </div>
 
           {loading && <LoadingSkeleton rows={4} />}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <ErrorState message={error} onRetry={refetch} />}
           {!loading && materials.length === 0 && (
             <EmptyState title="No materials available" description="Your trainer has not published learning materials for your program yet." />
           )}
 
-          <ul className="divide-y">
+          <ul className="divide-y divide-line">
             {materials.map((material) => (
               <li key={material.id} className="flex flex-wrap items-start justify-between gap-3 py-4">
                 <div className="max-w-2xl">
@@ -88,8 +88,8 @@ export default function TraineeMaterialsPage() {
                     {" · "}{sizeLabel(material.file_size)} · Added {formatDate(material.created_at)}
                   </p>
                 </div>
-                <Button size="sm" variant="secondary" onClick={() => download(material)} disabled={downloading === material.id}>
-                  {downloading === material.id ? "Downloading..." : "Download"}
+                <Button size="sm" variant="secondary" onClick={() => download(material)} loading={downloading === material.id}>
+                  {downloading === material.id ? "Downloading" : "Download"}
                 </Button>
               </li>
             ))}

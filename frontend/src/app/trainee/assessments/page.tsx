@@ -6,7 +6,7 @@ import { api } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { useToast } from "@/components/ui/Toast";
 import { formatDateTime, titleCase } from "@/lib/format";
-import { Badge, Button, Card, EmptyState, LoadingSkeleton, Modal, PageHeader, StatCard, Textarea } from "@/components/ui/Primitives";
+import { Badge, Button, Card, EmptyState, ErrorState, Modal, PageHeader, PageLoading, StatCard, Textarea } from "@/components/ui/Primitives";
 
 interface Attempt {
   id: number;
@@ -101,15 +101,15 @@ export default function TraineeAssessmentsPage() {
           breadcrumb="My Onboarding"
         />
 
-        {loading && <LoadingSkeleton rows={4} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading your assessments" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
               <StatCard title="Assigned Assessments" value={assessments.length} />
-              <StatCard title="Available to Take" value={assessments.filter((assessment) => assessment.can_start).length} tone="emerald" />
-              <StatCard title="Attempts Used" value={assessments.reduce((total, assessment) => total + assessment.attempts_used, 0)} tone="sky" />
+              <StatCard title="Available to Take" value={assessments.filter((assessment) => assessment.can_start).length} tone="accent" />
+              <StatCard title="Attempts Used" value={assessments.reduce((total, assessment) => total + assessment.attempts_used, 0)} tone="default" />
             </div>
 
             {assessments.length === 0 && <Card><EmptyState title="No assessments assigned" description="Assessments will appear once your trainer publishes them." /></Card>}
@@ -130,7 +130,7 @@ export default function TraineeAssessmentsPage() {
                       </p>
                     </div>
                     {assessment.can_start ? (
-                      <Button onClick={() => start(assessment)} disabled={starting === assessment.id}>{starting === assessment.id ? "Starting..." : "Start Attempt"}</Button>
+                      <Button onClick={() => start(assessment)} loading={starting === assessment.id}>{starting === assessment.id ? "Starting attempt" : "Start attempt"}</Button>
                     ) : (
                       <span className="text-xs text-slate-400">
                         {assessment.assessment_type === "practical" ? "Conducted by your evaluator" : "No remaining attempts"}
@@ -162,11 +162,11 @@ export default function TraineeAssessmentsPage() {
       </div>
 
       <Modal open={Boolean(active)} title={active?.assessment.title ?? "Assessment"} description={active?.assessment.instructions} onClose={() => setActive(null)} wide
-        footer={<><Button variant="secondary" onClick={() => setActive(null)}>Cancel</Button><Button onClick={submit} disabled={submitting}>{submitting ? "Submitting..." : "Submit Assessment"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setActive(null)}>Cancel</Button><Button onClick={submit} loading={submitting}>{submitting ? "Submitting assessment" : "Submit assessment"}</Button></>}
       >
         {active && (
           <div className="space-y-5">
-            <p className="rounded-lg bg-sky-50 p-3 text-sm text-sky-800">
+            <p className="rounded-md border border-line bg-canvas px-3.5 py-2.5 text-xs leading-5 text-ink-soft">
               {active.questions.length} questions · {active.assessment.total_points} total points · Passing score {active.assessment.passing_score}
             </p>
 

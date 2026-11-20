@@ -11,8 +11,10 @@ import {
   Badge,
   Button,
   Card,
+  ErrorState,
   Field,
   Input,
+  LoadingSkeleton,
   Modal,
   PageHeader,
   Pagination,
@@ -64,6 +66,8 @@ export default function AttendancePage() {
   const [programId, setProgramId] = useState("");
   const [page, setPage] = useState(1);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [chooserOpen, setChooserOpen] = useState(false);
+  const [chosenSession, setChosenSession] = useState("");
   const [records, setRecords] = useState<Record<number, { status: string; remarks: string }>>({});
   const [saving, setSaving] = useState(false);
 
@@ -71,6 +75,9 @@ export default function AttendancePage() {
   const summary = useApi<Record<string, number>>("/api/v1/attendance/summary");
   const programs = useApi<Array<{ id: number; name: string }>>("/api/v1/lookups/programs");
   const sheet = useApi<SessionSheet>(sessionId ? `/api/v1/sessions/${sessionId}/attendance` : null);
+  const sessions = useApi<Paginated<{ id: number; title: string; starts_at: string; status: string }>>(
+    chooserOpen ? "/api/v1/sessions?per_page=100" : null
+  );
 
   useEffect(() => {
     const requested = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("session") : null;
@@ -116,14 +123,14 @@ export default function AttendancePage() {
           title="Attendance Management"
           description="Record and monitor trainee attendance during scheduled training sessions."
           breadcrumb="Training Management"
-          actions={<Button onClick={() => { const value = window.prompt("Enter session ID to record attendance:", ""); if (value) setSessionId(value); }}>Record session attendance</Button>}
+          actions={<Button onClick={() => { setChosenSession(""); setChooserOpen(true); }}>Record attendance</Button>}
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="Attendance Records" value={summary.data?.total ?? "—"} />
-          <StatCard title="Present" value={summary.data?.present ?? "—"} tone="emerald" />
-          <StatCard title="Absent" value={summary.data?.absent ?? "—"} tone="red" />
-          <StatCard title="Late / Excused" value={Number(summary.data?.late ?? 0) + Number(summary.data?.excused ?? 0)} tone="amber" />
+          <StatCard loading={summary.loading} title="Attendance Records" value={summary.data?.total ?? "—"} />
+          <StatCard loading={summary.loading} title="Present" value={summary.data?.present ?? "—"} tone="accent" />
+          <StatCard loading={summary.loading} title="Absent" value={summary.data?.absent ?? "—"} tone="danger" />
+          <StatCard loading={summary.loading} title="Late / Excused" value={Number(summary.data?.late ?? 0) + Number(summary.data?.excused ?? 0)} tone="warning" />
         </div>
 
         <Card>
@@ -162,11 +169,47 @@ export default function AttendancePage() {
         </Card>
       </div>
 
-      <Modal open={Boolean(sessionId)} title="Record Session Attendance" onClose={() => setSessionId(null)} wide
-        footer={<><Button variant="secondary" onClick={() => setSessionId(null)}>Cancel</Button>{can("attendance.manage") && <Button onClick={saveSheet} disabled={saving}>{saving ? "Saving..." : "Save Attendance"}</Button>}</>}
+      <Modal
+        open={chooserOpen}
+        title="Select training session"
+        description="Choose the session whose attendance sheet you want to record."
+        onClose={() => setChooserOpen(false)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setChooserOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!chosenSession}
+              onClick={() => {
+                setSessionId(chosenSession);
+                setChooserOpen(false);
+              }}
+            >
+              Open attendance sheet
+            </Button>
+          </>
+        }
       >
-        {sheet.loading && <p className="text-sm text-slate-500">Loading session...</p>}
-        {sheet.error && <p className="text-sm text-red-600">{sheet.error}</p>}
+        {sessions.loading && <LoadingSkeleton rows={4} />}
+        {sessions.error && <ErrorState message={sessions.error} onRetry={sessions.refetch} />}
+        {sessions.data && (
+          <Field label="Training session" required hint="Scheduled and recent sessions are listed by date.">
+            <Select value={chosenSession} onChange={(event) => setChosenSession(event.target.value)}>
+              <option value="">Select a session...</option>
+              {sessions.data.data.map((session) => (
+                <option key={session.id} value={session.id}>
+                  {formatDate(session.starts_at)} · {session.title} ({titleCase(session.status)})
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
+      </Modal>
+
+      <Modal open={Boolean(sessionId)} title="Record session attendance" onClose={() => setSessionId(null)} wide
+        footer={<><Button variant="secondary" onClick={() => setSessionId(null)}>Cancel</Button>{can("attendance.manage") && <Button onClick={saveSheet} loading={saving}>{saving ? "Saving attendance" : "Save attendance"}</Button>}</>}
+      >
+        {sheet.loading && <LoadingSkeleton rows={5} />}
+        {sheet.error && <ErrorState message={sheet.error} onRetry={sheet.refetch} />}
         {sheet.data && (
           <div className="space-y-3">
             <div className="rounded-lg border bg-slate-50 p-3 text-sm">

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, AUTH_UNAUTHORIZED_EVENT } from "@/lib/api/client";
+import { clearApiCache } from "@/lib/hooks";
 import type { AuthUser } from "@/lib/format";
 
 interface AuthState {
@@ -53,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const redirectToLogin = useCallback(
     (expired: boolean) => {
       setUser(null);
+      clearApiCache();
 
       if (typeof window === "undefined") return;
       if (window.location.pathname.startsWith("/login")) return;
@@ -98,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // The session may already be expired; local state is cleared regardless.
     } finally {
       setUser(null);
+      clearApiCache();
       router.replace("/login");
       router.refresh();
     }

@@ -7,7 +7,7 @@ import { useApi } from "@/lib/hooks";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { formatDateTime, titleCase } from "@/lib/format";
-import { Badge, Button, Card, Field, Input, Modal, PageHeader, Pagination, SearchInput, StatCard, Textarea } from "@/components/ui/Primitives";
+import { Badge, Button, Card, ErrorState, Field, Input, LoadingSkeleton, Modal, PageHeader, Pagination, SearchInput, Select, StatCard, Textarea } from "@/components/ui/Primitives";
 import { DataTable } from "@/components/ui/DataTable";
 
 interface AttemptRow {
@@ -116,25 +116,25 @@ export default function AssessmentResultsPage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <StatCard title="Total Attempts" value={summary.data?.total ?? "—"} />
-          <StatCard title="Passed" value={summary.data?.passed ?? "—"} tone="emerald" />
-          <StatCard title="Failed" value={summary.data?.failed ?? "—"} tone="red" />
-          <StatCard title="Pending Evaluation" value={summary.data?.pending ?? "—"} tone="amber" />
-          <StatCard title="Results Unreleased" value={summary.data?.unreleased ?? "—"} tone="violet" />
+          <StatCard loading={summary.loading} title="Total Attempts" value={summary.data?.total ?? "—"} />
+          <StatCard loading={summary.loading} title="Passed" value={summary.data?.passed ?? "—"} tone="accent" />
+          <StatCard loading={summary.loading} title="Failed" value={summary.data?.failed ?? "—"} tone="danger" />
+          <StatCard loading={summary.loading} title="Pending Evaluation" value={summary.data?.pending ?? "—"} tone="warning" />
+          <StatCard loading={summary.loading} title="Results Unreleased" value={summary.data?.unreleased ?? "—"} tone="default" />
         </div>
 
         <Card>
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <SearchInput value={search} onChange={setSearch} placeholder="Search assessment..." />
-            <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="w-44 rounded-lg border px-3 py-2 text-sm">
+            <Select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="w-44">
               <option value="">All statuses</option>
               {["in_progress", "submitted", "evaluated"].map((value) => <option key={value} value={value}>{titleCase(value)}</option>)}
-            </select>
-            <select value={result} onChange={(e) => { setResult(e.target.value); setPage(1); }} className="w-40 rounded-lg border px-3 py-2 text-sm">
+            </Select>
+            <Select value={result} onChange={(e) => { setResult(e.target.value); setPage(1); }} className="w-40">
               <option value="">All results</option>
               <option value="passed">Passed</option>
               <option value="failed">Failed</option>
-            </select>
+            </Select>
           </div>
 
           <DataTable
@@ -157,7 +157,7 @@ export default function AssessmentResultsPage() {
             emptyTitle="No assessment attempts"
           />
 
-          <div className="mt-4 border-t pt-3">
+          <div className="mt-4 border-t border-line pt-3">
             <Pagination page={list.data?.current_page ?? 1} lastPage={list.data?.last_page ?? 1} total={list.data?.total ?? 0} onPage={setPage} />
           </div>
         </Card>
@@ -168,11 +168,12 @@ export default function AssessmentResultsPage() {
           <>
             <Button variant="secondary" onClick={() => { setViewing(null); setGrading(null); }}>Close</Button>
             {grading?.assessment && <Button variant="secondary" onClick={() => release(grading.assessment.id)}>Release results</Button>}
-            {can("assessments.evaluate") && <Button onClick={grade} disabled={saving}>{saving ? "Saving..." : "Save Evaluation"}</Button>}
+            {can("assessments.evaluate") && <Button onClick={grade} loading={saving}>{saving ? "Saving evaluation" : "Save evaluation"}</Button>}
           </>
         }
       >
-        {detail.loading && <p className="text-sm text-slate-500">Loading attempt...</p>}
+        {detail.loading && <LoadingSkeleton rows={5} />}
+        {detail.error && <ErrorState message={detail.error} onRetry={detail.refetch} />}
         {detail.data && (
           <div className="space-y-4">
             <div className="rounded-lg border bg-slate-50 p-3 text-sm">

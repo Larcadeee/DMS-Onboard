@@ -253,7 +253,7 @@ export default function TraineeProfilePage() {
                         {progress.outstanding.map((item) => <li key={item}>{item}</li>)}
                       </ul>
                     ) : (
-                      <p className="mt-1 text-xs text-emerald-600">All mandatory requirements satisfied.</p>
+                      <p className="mt-1 text-xs text-brand-dark">All mandatory requirements satisfied.</p>
                     )}
                   </div>
                 </Card>
@@ -416,7 +416,7 @@ export default function TraineeProfilePage() {
       </div>
 
       <Modal open={docOpen} title="Upload trainee document" onClose={() => setDocOpen(false)}
-        footer={<><Button variant="secondary" onClick={() => setDocOpen(false)}>Cancel</Button><Button onClick={uploadDocument} disabled={uploading}>{uploading ? "Uploading..." : "Upload"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setDocOpen(false)}>Cancel</Button><Button onClick={uploadDocument} loading={uploading}>{uploading ? "Uploading document" : "Upload document"}</Button></>}
       >
         <div className="space-y-4">
           <Field label="Document Type" required>

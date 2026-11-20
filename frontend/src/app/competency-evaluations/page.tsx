@@ -116,10 +116,10 @@ export default function CompetencyEvaluationsPage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="In Progress" value={summaryValue("in_progress")} tone="sky" />
-          <StatCard title="Needs Improvement" value={summaryValue("needs_improvement")} tone="amber" />
-          <StatCard title="Competent" value={summaryValue("competent")} tone="violet" />
-          <StatCard title="Validated" value={summaryValue("validated")} tone="emerald" />
+          <StatCard loading={summary.loading} title="In Progress" value={summaryValue("in_progress")} tone="default" />
+          <StatCard loading={summary.loading} title="Needs Improvement" value={summaryValue("needs_improvement")} tone="warning" />
+          <StatCard loading={summary.loading} title="Competent" value={summaryValue("competent")} tone="default" />
+          <StatCard loading={summary.loading} title="Validated" value={summaryValue("validated")} tone="accent" />
         </div>
 
         <Card>
@@ -152,7 +152,7 @@ export default function CompetencyEvaluationsPage() {
                 render: (row) => (
                   <div className="flex gap-1">
                     {canValidate && row.status === "competent" && <Button size="sm" onClick={() => validate(row)}>Validate</Button>}
-                    {row.status === "validated" && <span className="text-xs text-emerald-600">Validated {row.validator?.name ? `by ${row.validator.name}` : ""}</span>}
+                    {row.status === "validated" && <span className="text-xs text-brand-dark">Validated {row.validator?.name ? `by ${row.validator.name}` : ""}</span>}
                   </div>
                 ),
               },
@@ -167,10 +167,10 @@ export default function CompetencyEvaluationsPage() {
       </div>
 
       <Modal open={open} title="Record Competency Evaluation" onClose={() => setOpen(false)} wide
-        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="evaluation-form" disabled={saving}>{saving ? "Saving..." : "Save Evaluation"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="evaluation-form" loading={saving}>{saving ? "Saving evaluation" : "Save evaluation"}</Button></>}
       >
         <form id="evaluation-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {error && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{error}</p>}
           <Field label="Trainee" required>
             <Select required value={form.enrollment_id} onChange={(e) => setForm({ ...form, enrollment_id: e.target.value })}>
               <option value="">Select trainee...</option>

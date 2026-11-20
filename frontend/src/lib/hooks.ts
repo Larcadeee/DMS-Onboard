@@ -11,11 +11,18 @@ interface ApiState<T> {
   setData: (value: T | null) => void;
 }
 
+const responseCache = new Map<string, unknown>();
+
+export function clearApiCache(): void {
+  responseCache.clear();
+}
+
 export function useApi<T>(endpoint: string | null): ApiState<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(Boolean(endpoint));
+  const [data, setData] = useState<T | null>(() => (endpoint ? ((responseCache.get(endpoint) as T | undefined) ?? null) : null));
+  const [loading, setLoading] = useState(() => Boolean(endpoint) && !responseCache.has(endpoint as string));
   const [error, setError] = useState("");
   const mounted = useRef(true);
+  const requestId = useRef(0);
 
   useEffect(() => {
     mounted.current = true;
@@ -26,30 +33,47 @@ export function useApi<T>(endpoint: string | null): ApiState<T> {
 
   const load = useCallback(async () => {
     if (!endpoint) {
+      setData(null);
       setLoading(false);
+      setError("");
       return;
     }
 
-    setLoading(true);
+    const cached = responseCache.get(endpoint) as T | undefined;
+    const currentRequest = ++requestId.current;
+
+    if (cached !== undefined) {
+      setData(cached);
+    } else {
+      setData(null);
+    }
+
+    setLoading(cached === undefined);
     setError("");
 
     try {
       const result = await api.get<T>(endpoint);
-      if (mounted.current) setData(result);
+      responseCache.set(endpoint, result);
+
+      if (mounted.current && currentRequest === requestId.current) {
+        setData(result);
+      }
     } catch (err) {
-      if (mounted.current) {
+      if (mounted.current && currentRequest === requestId.current) {
         setError(err instanceof Error ? err.message : "Unable to load data.");
       }
     } finally {
-      if (mounted.current) setLoading(false);
+      if (mounted.current && currentRequest === requestId.current) {
+        setLoading(false);
+      }
     }
   }, [endpoint]);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
-  return { data, loading, error, refetch: load, setData };
+  return { data, loading, error, refetch: () => load(), setData };
 }
 
 export function useDebounced<T>(value: T, delay = 350): T {

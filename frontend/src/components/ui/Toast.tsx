@@ -21,6 +21,12 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
+const tones: Record<ToastItem["tone"], { bar: string; dot: string }> = {
+  success: { bar: "border-l-brand", dot: "bg-brand" },
+  error: { bar: "border-l-red-500", dot: "bg-red-500" },
+  info: { bar: "border-l-ink", dot: "bg-ink" },
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
@@ -38,19 +44,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="fixed bottom-5 right-5 z-[60] flex w-80 flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(20rem,calc(100vw-2rem))] flex-col gap-2" aria-live="polite" aria-atomic="false">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`rounded-lg border px-4 py-3 text-sm shadow-lg ${
-              toast.tone === "error"
-                ? "border-red-200 bg-red-50 text-red-800"
-                : toast.tone === "info"
-                  ? "border-sky-200 bg-sky-50 text-sky-800"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-800"
-            }`}
+            className={`toast-item pointer-events-auto flex items-start gap-2.5 rounded-md border border-line border-l-2 bg-surface px-3.5 py-3 text-[13px] leading-5 text-ink shadow-lg ${tones[toast.tone].bar}`}
+            role={toast.tone === "error" ? "alert" : "status"}
           >
-            {toast.message}
+            <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${tones[toast.tone].dot}`} aria-hidden="true" />
+            <span>{toast.message}</span>
           </div>
         ))}
       </div>

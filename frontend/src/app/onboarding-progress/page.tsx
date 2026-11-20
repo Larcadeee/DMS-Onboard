@@ -7,7 +7,7 @@ import { useApi, useDebounced } from "@/lib/hooks";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate, titleCase } from "@/lib/format";
-import { Badge, Button, Card, DetailRow, Field, Modal, PageHeader, Pagination, ProgressBar, SearchInput, Select, StatCard, Textarea } from "@/components/ui/Primitives";
+import { Badge, Button, Card, DetailRow, ErrorState, Field, LoadingSkeleton, Modal, PageHeader, Pagination, ProgressBar, SearchInput, Select, StatCard, Textarea } from "@/components/ui/Primitives";
 import { DataTable } from "@/components/ui/DataTable";
 
 interface ProgressRow {
@@ -81,11 +81,11 @@ export default function OnboardingProgressPage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <StatCard title="Total Enrollments" value={summary.data?.total ?? "—"} />
-          <StatCard title="In Progress" value={summary.data?.in_progress ?? "—"} tone="sky" />
-          <StatCard title="Completed" value={summary.data?.completed ?? "—"} tone="emerald" />
-          <StatCard title="On Hold" value={summary.data?.on_hold ?? "—"} tone="amber" />
-          <StatCard title="Pending Final Review" value={summary.data?.pending_review ?? "—"} tone="violet" />
+          <StatCard loading={summary.loading} title="Total Enrollments" value={summary.data?.total ?? "—"} />
+          <StatCard loading={summary.loading} title="In Progress" value={summary.data?.in_progress ?? "—"} tone="default" />
+          <StatCard loading={summary.loading} title="Completed" value={summary.data?.completed ?? "—"} tone="accent" />
+          <StatCard loading={summary.loading} title="On Hold" value={summary.data?.on_hold ?? "—"} tone="warning" />
+          <StatCard loading={summary.loading} title="Pending Final Review" value={summary.data?.pending_review ?? "—"} tone="default" />
         </div>
 
         <Card>
@@ -119,7 +119,7 @@ export default function OnboardingProgressPage() {
             emptyTitle="No onboarding records"
           />
 
-          <div className="mt-4 border-t pt-3">
+          <div className="mt-4 border-t border-line pt-3">
             <Pagination page={list.data?.current_page ?? 1} lastPage={list.data?.last_page ?? 1} total={list.data?.total ?? 0} onPage={setPage} />
           </div>
         </Card>
@@ -135,13 +135,14 @@ export default function OnboardingProgressPage() {
             {detail.data && detail.data.progress.status !== "completed" && can("approvals.final") && (
               <>
                 <Button variant="danger" onClick={() => act("return")} disabled={acting || !remarks}>Return for training</Button>
-                <Button onClick={() => act("approve")} disabled={acting}>Approve completion</Button>
+                <Button onClick={() => act("approve")} loading={acting}>Approve completion</Button>
               </>
             )}
           </>
         }
       >
-        {detail.loading && <p className="text-sm text-slate-500">Loading progress...</p>}
+        {detail.loading && <LoadingSkeleton rows={5} />}
+        {detail.error && <ErrorState message={detail.error} onRetry={detail.refetch} />}
         {detail.data && (
           <div className="space-y-4">
             <div className="rounded-lg border bg-slate-50 p-3">
@@ -169,7 +170,7 @@ export default function OnboardingProgressPage() {
                   {detail.data.progress.outstanding.map((item) => <li key={item}>{item}</li>)}
                 </ul>
               ) : (
-                <p className="mt-1 text-sm text-emerald-600">All mandatory requirements satisfied.</p>
+                <p className="mt-1 text-sm text-brand-dark">All mandatory requirements satisfied.</p>
               )}
             </div>
 

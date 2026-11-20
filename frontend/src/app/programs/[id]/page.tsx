@@ -46,7 +46,7 @@ interface Program {
   start_date?: string;
   end_date?: string;
   status: string;
-  curriculumVersions: Version[];
+  curriculum_versions: Version[];
 }
 
 interface TraineeRow {
@@ -64,7 +64,7 @@ export default function ProgramDetailPage() {
   const program = useApi<{ program: Program; trainees_count: number }>(`/api/v1/programs/${params.id}`);
   const trainees = useApi<Paginated<TraineeRow>>(`/api/v1/trainees?program_id=${params.id}`);
 
-  const version = program.data?.program.curriculumVersions?.[0];
+  const version = program.data?.program.curriculum_versions?.[0];
   const phases = version?.phases ?? [];
 
   return (
@@ -88,39 +88,39 @@ export default function ProgramDetailPage() {
         {program.data && (
           <>
             <Tabs
-              value={tab}
-              onChange={setTab}
-              tabs={[
-                { value: "overview", label: "Overview" },
-                { value: "curriculum", label: "Curriculum", count: phases.length },
-                { value: "trainees", label: "Trainees", count: program.data.trainees_count },
-              ]}
-            />
+                  value={tab}
+                  onChange={setTab}
+                  tabs={[
+                    { value: "overview", label: "Overview" },
+                    { value: "curriculum", label: "Curriculum", count: phases.length },
+                    { value: "trainees", label: "Trainees", count: program.data.trainees_count },
+                  ]}
+                />
 
-            {tab === "overview" && (
-              <div className="grid gap-4 lg:grid-cols-3">
-                <Card title="Program Information" className="lg:col-span-2">
-                  <dl className="divide-y">
-                    <DetailRow label="Program code" value={<span className="font-mono text-xs">{program.data.program.code}</span>} />
-                    <DetailRow label="Status" value={<Badge status={program.data.program.status}>{titleCase(program.data.program.status)}</Badge>} />
-                    <DetailRow label="Duration" value={program.data.program.duration_days ? `${program.data.program.duration_days} days` : "—"} />
-                    <DetailRow label="Start date" value={formatDate(program.data.program.start_date)} />
-                    <DetailRow label="End date" value={formatDate(program.data.program.end_date)} />
-                    <DetailRow label="Target participants" value={program.data.program.target_participants ?? "—"} />
-                    <DetailRow label="Objectives" value={program.data.program.objectives ?? "—"} />
-                  </dl>
-                </Card>
+                {tab === "overview" && (
+                  <div className="grid gap-4 lg:grid-cols-3">
+                    <Card title="Program Information" className="lg:col-span-2">
+                      <dl className="divide-y">
+                        <DetailRow label="Program code" value={<span className="font-mono text-xs">{program.data.program.code}</span>} />
+                        <DetailRow label="Status" value={<Badge status={program.data.program.status}>{titleCase(program.data.program.status)}</Badge>} />
+                        <DetailRow label="Duration" value={program.data.program.duration_days ? `${program.data.program.duration_days} days` : "—"} />
+                        <DetailRow label="Start date" value={formatDate(program.data.program.start_date)} />
+                        <DetailRow label="End date" value={formatDate(program.data.program.end_date)} />
+                        <DetailRow label="Target participants" value={program.data.program.target_participants ?? "—"} />
+                        <DetailRow label="Objectives" value={program.data.program.objectives ?? "—"} />
+                      </dl>
+                    </Card>
 
-                <Card title="Program Snapshot">
-                  <dl className="divide-y">
-                    <DetailRow label="Curriculum versions" value={program.data.program.curriculumVersions.length} />
-                    <DetailRow label="Active version" value={version ? `v${version.version_number} (${version.status})` : "—"} />
-                    <DetailRow label="Training phases" value={phases.length} />
-                    <DetailRow label="Assigned trainees" value={program.data.trainees_count} />
-                  </dl>
-                </Card>
-              </div>
-            )}
+                    <Card title="Program Snapshot">
+                      <dl className="divide-y">
+                        <DetailRow label="Curriculum versions" value={program.data.program.curriculum_versions.length} />
+                        <DetailRow label="Active version" value={version ? `v${version.version_number} (${version.status})` : "—"} />
+                        <DetailRow label="Training phases" value={phases.length} />
+                        <DetailRow label="Assigned trainees" value={program.data.trainees_count} />
+                      </dl>
+                    </Card>
+                  </div>
+                )}
 
             {tab === "curriculum" && (
               <div className="space-y-4">

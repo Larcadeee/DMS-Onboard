@@ -119,10 +119,10 @@ export default function CompetenciesPage() {
         />
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="Total Competencies" value={summary.data?.total ?? "—"} />
-          <StatCard title="Categories" value={summary.data?.categories ?? "—"} tone="sky" />
-          <StatCard title="Archived" value={summary.data?.archived ?? "—"} tone="amber" />
-          <StatCard title="Validated Evaluations" value={summary.data?.validated ?? "—"} tone="emerald" />
+          <StatCard loading={summary.loading} title="Total Competencies" value={summary.data?.total ?? "—"} />
+          <StatCard loading={summary.loading} title="Categories" value={summary.data?.categories ?? "—"} tone="default" />
+          <StatCard loading={summary.loading} title="Archived" value={summary.data?.archived ?? "—"} tone="warning" />
+          <StatCard loading={summary.loading} title="Validated Evaluations" value={summary.data?.validated ?? "—"} tone="accent" />
         </div>
 
         <Card>
@@ -167,10 +167,10 @@ export default function CompetenciesPage() {
       </div>
 
       <Modal open={open} title={editing ? "Edit Competency" : "Add Competency"} onClose={() => setOpen(false)} wide
-        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="competency-form" disabled={saving}>{saving ? "Saving..." : "Save"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="competency-form" loading={saving}>{saving ? "Saving changes" : "Save changes"}</Button></>}
       >
         <form id="competency-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {error && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{error}</p>}
           <Field label="Competency Code" required><Input required value={String(form.code ?? "")} onChange={(e) => setForm({ ...form, code: e.target.value })} /></Field>
           <Field label="Competency Name" required><Input required value={String(form.name ?? "")} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
           <Field label="Category"><Input value={String(form.category ?? "")} onChange={(e) => setForm({ ...form, category: e.target.value })} /></Field>

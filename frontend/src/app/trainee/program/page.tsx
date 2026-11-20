@@ -3,7 +3,7 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { titleCase } from "@/lib/format";
-import { Badge, Card, LoadingSkeleton, PageHeader, ProgressBar, StatCard } from "@/components/ui/Primitives";
+import { Badge, Card, ErrorState, PageHeader, PageLoading, ProgressBar, StatCard } from "@/components/ui/Primitives";
 
 interface Module {
   id: number;
@@ -32,7 +32,7 @@ interface ProgramView {
 }
 
 export default function TraineeProgramPage() {
-  const { data, loading, error } = useApi<ProgramView>("/api/v1/my/program");
+  const { data, loading, error, refetch } = useApi<ProgramView>("/api/v1/my/program");
 
   return (
     <DashboardLayout>
@@ -44,15 +44,15 @@ export default function TraineeProgramPage() {
           actions={data ? <Badge status={data.enrollment.status}>{titleCase(data.enrollment.status)}</Badge> : undefined}
         />
 
-        {loading && <LoadingSkeleton rows={3} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading your onboarding program" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
               <StatCard title="Overall Progress" value={`${Math.round(data.progress.progress)}%`} />
-              <StatCard title="Modules Completed" value={`${data.progress.modules_completed}/${data.progress.modules_total}`} tone="sky" />
-              <StatCard title="Current Phase" value={data.progress.current_phase ?? "—"} tone="emerald" />
+              <StatCard title="Modules Completed" value={`${data.progress.modules_completed}/${data.progress.modules_total}`} tone="default" />
+              <StatCard title="Current Phase" value={data.progress.current_phase ?? "—"} tone="accent" />
             </div>
 
             <Card
@@ -69,7 +69,7 @@ export default function TraineeProgramPage() {
 
             <div className="space-y-3">
               {data.phases.map((phase) => (
-                <details key={phase.id} open={!phase.is_completed} className="rounded-xl border bg-white shadow-sm">
+                <details key={phase.id} open={!phase.is_completed} className="rounded-lg border bg-white">
                   <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 p-4">
                     <div>
                       <p className="font-semibold text-slate-900">{phase.name}</p>

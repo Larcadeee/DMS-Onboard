@@ -7,6 +7,7 @@ import { api } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth";
 import { titleCase } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
+import { NotificationPopover } from "@/components/layout/NotificationPopover";
 
 function pageTitle(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
@@ -67,65 +68,75 @@ export default function Header({
   }, []);
 
   return (
-    <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b bg-white px-4 sm:px-6">
+    <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-line bg-surface px-4 sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-2">
-        <button type="button" onClick={onMenu} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Open navigation">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
+        <button
+          type="button"
+          onClick={onMenu}
+          className="rounded-md p-2 text-muted transition-colors hover:bg-canvas hover:text-ink lg:hidden"
+          aria-label="Open navigation"
+          title="Open navigation"
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <button type="button" onClick={onCollapse} className="hidden rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:block" aria-label="Collapse navigation">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M4 6h16M4 12h16M4 18h16" />
+        <button
+          type="button"
+          onClick={onCollapse}
+          className="hidden rounded-md p-2 text-muted transition-colors hover:bg-canvas hover:text-ink lg:block"
+          aria-label="Collapse navigation"
+          title="Collapse sidebar"
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+            <path d="M9.5 4.5v15M13.5 9l3 3-3 3" />
           </svg>
         </button>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-900">{pageTitle(pathname)}</p>
-          <p className="truncate text-xs text-slate-500">CDRRMD New Hire Onboarding Management System</p>
+          <p className="truncate text-[13px] font-semibold tracking-tight text-ink">{pageTitle(pathname)}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Link href="/notifications" className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-            <path d="M10 21h4" />
-          </svg>
-          {unread > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-              {unread > 9 ? "9+" : unread}
-            </span>
-          )}
-        </Link>
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <NotificationPopover unreadCount={unread} />
 
         <div className="relative" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100"
+            className="flex items-center gap-2 rounded-md px-1.5 py-1.5 transition-colors hover:bg-canvas sm:px-2"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
           >
             <Avatar src={user?.avatar_url} name={user?.name} size="sm" />
             <span className="hidden text-left sm:block">
-              <span className="block text-sm font-medium text-slate-800">{user?.name ?? "User"}</span>
-              <span className="block text-xs text-slate-500">{user?.role?.name ?? ""}</span>
+              <span className="block max-w-40 truncate text-[13px] font-medium text-ink">{user?.name ?? "User"}</span>
+              <span className="block max-w-40 truncate text-[11px] text-muted">{user?.role?.name ?? ""}</span>
             </span>
-            <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <svg viewBox="0 0 20 20" className="hidden h-4 w-4 text-faint sm:block" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
               <path d="M5 8l5 5 5-5" />
             </svg>
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-lg border bg-white py-1 shadow-lg">
-              <div className="border-b px-4 py-2">
-                <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                <p className="truncate text-xs text-slate-500">{user?.email}</p>
+            <div className="absolute right-0 mt-2 w-60 rounded-lg border border-line bg-surface py-1 shadow-lg" role="menu">
+              <div className="border-b border-line px-4 py-2.5">
+                <p className="truncate text-[13px] font-medium text-ink">{user?.name}</p>
+                <p className="truncate text-[11px] text-muted">{user?.email}</p>
               </div>
-              <Link href="/profile" onClick={() => setMenuOpen(false)} className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Profile settings</Link>
-              <Link href="/change-password" onClick={() => setMenuOpen(false)} className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Change password</Link>
+              <Link href="/profile" onClick={() => setMenuOpen(false)} className="block px-4 py-2 text-[13px] text-ink-soft transition-colors hover:bg-canvas hover:text-ink" role="menuitem">
+                Profile settings
+              </Link>
+              <Link href="/change-password" onClick={() => setMenuOpen(false)} className="block px-4 py-2 text-[13px] text-ink-soft transition-colors hover:bg-canvas hover:text-ink" role="menuitem">
+                Change password
+              </Link>
+              <div className="my-1 border-t border-line" />
               <button
                 type="button"
                 onClick={logout}
-                className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                className="block w-full px-4 py-2 text-left text-[13px] text-red-600 transition-colors hover:bg-red-50"
+                role="menuitem"
               >
                 Sign out
               </button>

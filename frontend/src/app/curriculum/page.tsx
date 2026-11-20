@@ -12,10 +12,12 @@ import {
   Badge,
   Button,
   Card,
+  ErrorState,
   Field,
   Input,
   Modal,
   PageHeader,
+  PageLoading,
   Select,
   Textarea,
 } from "@/components/ui/Primitives";
@@ -218,8 +220,8 @@ export default function CurriculumPage() {
           </div>
         </Card>
 
-        {curriculum.loading && <p className="text-sm text-slate-500">Loading curriculum...</p>}
-        {curriculum.error && <p className="text-sm text-red-600">{curriculum.error}</p>}
+        {curriculum.loading && <PageLoading label="Loading curriculum" />}
+        {curriculum.error && <ErrorState message={curriculum.error} onRetry={curriculum.refetch} />}
 
         {version && version.phases.length === 0 && (
           <Card><p className="text-sm text-slate-500">No phases configured. Add the first training phase to begin.</p></Card>
@@ -287,10 +289,10 @@ export default function CurriculumPage() {
       </div>
 
       <Modal open={Boolean(modal)} title={modal?.id ? "Edit curriculum item" : `Add ${modal?.type ?? ""}`} onClose={() => setModal(null)}
-        footer={<><Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button><Button type="submit" form="curriculum-form" disabled={saving}>{saving ? "Saving..." : "Save"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button><Button type="submit" form="curriculum-form" loading={saving}>{saving ? "Saving changes" : "Save changes"}</Button></>}
       >
         <form id="curriculum-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {error && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{error}</p>}
 
           {modal?.type === "phase" && (
             <>

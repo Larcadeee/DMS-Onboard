@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, query, type Paginated } from "@/lib/api/client";
 import { useApi, useDebounced } from "@/lib/hooks";
-import { Button, Card, Field, Input, Modal, PageHeader, Pagination, SearchInput, Select, StatCard, Textarea } from "./Primitives";
+import { Button, Card, Field, Input, Modal, PageHeader, Pagination, SearchInput, Select, Skeleton, StatCard, Textarea } from "./Primitives";
 import { DataTable, type Column } from "./DataTable";
 import { useToast } from "./Toast";
 
@@ -188,14 +188,22 @@ export function ResourcePage({
 
       {summaryCards.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {summaryCards.map((card) => (
-            <StatCard
-              key={card.key}
-              title={card.title}
-              value={(summary.data?.[card.key] as string | number | undefined) ?? "—"}
-              description={card.description}
-            />
-          ))}
+          {summaryCards.map((card) =>
+            summary.loading ? (
+              <div key={card.key} className="rounded-lg border border-line bg-surface px-4 py-4">
+                <Skeleton className="h-2.5 w-24" />
+                <Skeleton className="mt-3 h-7 w-14" />
+                <Skeleton className="mt-2 h-2.5 w-32" />
+              </div>
+            ) : (
+              <StatCard
+                key={card.key}
+                title={card.title}
+                value={(summary.data?.[card.key] as string | number | undefined) ?? "—"}
+                description={card.description}
+              />
+            )
+          )}
         </div>
       )}
 
@@ -229,7 +237,7 @@ export function ResourcePage({
           emptyAction={canManage ? <Button size="sm" onClick={openCreate}>{createLabel}</Button> : undefined}
         />
 
-        <div className="mt-4 border-t pt-3">
+        <div className="mt-4 border-t border-line pt-3">
           <Pagination
             page={list.data?.current_page ?? 1}
             lastPage={list.data?.last_page ?? 1}
@@ -247,12 +255,12 @@ export function ResourcePage({
         footer={
           <>
             <Button variant="secondary" type="button" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" form="resource-form" disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
+            <Button type="submit" form="resource-form" loading={saving}>{saving ? "Saving changes" : "Save changes"}</Button>
           </>
         }
       >
         <form id="resource-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {formError && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{formError}</p>}
+          {formError && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{formError}</p>}
           {fields.map((field) => {
             const value = values[field.name];
             const common = {
@@ -313,7 +321,7 @@ export function ResourcePage({
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirming(null)}>Cancel</Button>
-            <Button variant="danger" onClick={() => confirming && remove(confirming)}>Archive</Button>
+            <Button variant="danger" onClick={() => confirming && remove(confirming)}>Archive record</Button>
           </>
         }
       >

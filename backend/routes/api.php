@@ -25,6 +25,12 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:10,1');
 
+    Route::post('/register', [AuthController::class, 'register'])
+        ->middleware('throttle:5,1');
+
+    Route::post('/auth/google', [AuthController::class, 'google'])
+        ->middleware('throttle:10,1');
+
     Route::middleware([
         'auth:sanctum',
         'active',
@@ -211,6 +217,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
             Route::post('/users/{user}/photo', [\App\Http\Controllers\Api\ProfileController::class, 'updateUserPhoto']);
         });
+        Route::middleware('permission:users.approve')->group(function () {
+            Route::post('/users/{user}/approve', [UserController::class, 'approve']);
+            Route::post('/users/{user}/reject', [UserController::class, 'reject']);
+        });
+        Route::middleware('permission:users.deactivate')->group(function () {
+            Route::post('/users/{user}/activate', [UserController::class, 'activate']);
+            Route::post('/users/{user}/deactivate', [UserController::class, 'deactivate']);
+        });
+        Route::middleware('permission:users.delete')->delete('/users/{user}', [UserController::class, 'destroy']);
 
         // Roles and permissions
         Route::middleware('permission:roles.manage')->group(function () {

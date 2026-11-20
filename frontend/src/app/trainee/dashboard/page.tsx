@@ -4,7 +4,7 @@ import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDate, formatDateTime, titleCase } from "@/lib/format";
-import { Badge, Card, EmptyState, LoadingSkeleton, PageHeader, ProgressBar, StatCard } from "@/components/ui/Primitives";
+import { Badge, Card, EmptyState, ErrorState, PageHeader, PageLoading, ProgressBar } from "@/components/ui/Primitives";
 
 interface PortalDashboard {
   trainee: { first_name: string; last_name: string; trainee_number: string };
@@ -28,7 +28,7 @@ interface PortalDashboard {
 }
 
 export default function TraineeDashboardPage() {
-  const { data, loading, error } = useApi<PortalDashboard>("/api/v1/my/dashboard");
+  const { data, loading, error, refetch } = useApi<PortalDashboard>("/api/v1/my/dashboard");
 
   return (
     <DashboardLayout>
@@ -40,18 +40,33 @@ export default function TraineeDashboardPage() {
           actions={data ? <Badge status={data.enrollment.status}>{titleCase(data.enrollment.status)}</Badge> : undefined}
         />
 
-        {loading && <LoadingSkeleton rows={4} />}
-        {error && <Card><p className="text-sm text-red-600">{error}</p></Card>}
+        {loading && <PageLoading label="Loading your dashboard" />}
+        {error && <ErrorState message={error} onRetry={refetch} />}
 
         {data && (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-              <StatCard title="Overall Progress" value={`${Math.round(data.progress.progress)}%`} />
-              <StatCard title="Modules" value={`${data.progress.modules_completed}/${data.progress.modules_total}`} tone="sky" />
-              <StatCard title="Attendance" value={`${data.progress.attendance_rate}%`} tone="emerald" />
-              <StatCard title="Assessments" value={`${data.progress.assessments_passed}/${data.progress.assessments_total}`} tone="violet" />
-              <StatCard title="Competencies" value={`${data.progress.competencies_validated}/${data.progress.competencies_total}`} tone="amber" />
-            </div>
+            <section className="grid overflow-hidden rounded-lg border border-line bg-surface sm:grid-cols-3 lg:grid-cols-5 sm:divide-x sm:divide-line">
+              <div className="border-b border-line px-4 py-4 sm:border-b-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Overall progress</p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-brand-dark">{Math.round(data.progress.progress)}%</p>
+              </div>
+              <div className="border-b border-line px-4 py-4 sm:border-b-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Modules</p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{data.progress.modules_completed}/{data.progress.modules_total}</p>
+              </div>
+              <div className="border-b border-line px-4 py-4 sm:border-b-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Attendance</p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{data.progress.attendance_rate}%</p>
+              </div>
+              <div className="border-b border-line px-4 py-4 sm:border-b-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Assessments</p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{data.progress.assessments_passed}/{data.progress.assessments_total}</p>
+              </div>
+              <div className="px-4 py-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted">Competencies</p>
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-ink">{data.progress.competencies_validated}/{data.progress.competencies_total}</p>
+              </div>
+            </section>
 
             <Card title="Onboarding Progress" description={data.progress.current_phase ? `Current phase: ${data.progress.current_phase}` : undefined}>
               <ProgressBar value={data.progress.progress} />
@@ -63,12 +78,12 @@ export default function TraineeDashboardPage() {
                   </ul>
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-emerald-600">All requirements are complete.</p>
+                <p className="mt-4 text-sm text-brand-dark">All requirements are complete.</p>
               )}
             </Card>
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <Card title="Upcoming Sessions" actions={<Link href="/trainee/schedule" className="text-sm font-medium text-slate-600 underline">View schedule</Link>}>
+              <Card title="Upcoming Sessions" actions={<Link href="/trainee/schedule" className="text-xs font-medium text-brand-dark hover:underline">View schedule</Link>}>
                 {data.upcoming_sessions.length === 0 && <EmptyState title="No upcoming sessions" />}
                 <ul className="divide-y">
                   {data.upcoming_sessions.map((session) => (
@@ -83,7 +98,7 @@ export default function TraineeDashboardPage() {
                 </ul>
               </Card>
 
-              <Card title="Recent Attendance" actions={<Link href="/trainee/attendance" className="text-sm font-medium text-slate-600 underline">View attendance</Link>}>
+              <Card title="Recent Attendance" actions={<Link href="/trainee/attendance" className="text-xs font-medium text-brand-dark hover:underline">View attendance</Link>}>
                 {data.recent_attendance.length === 0 && <EmptyState title="No attendance records yet" />}
                 <ul className="divide-y">
                   {data.recent_attendance.map((record) => (
@@ -98,7 +113,7 @@ export default function TraineeDashboardPage() {
                 </ul>
               </Card>
 
-              <Card title="Released Assessment Results" actions={<Link href="/trainee/assessments" className="text-sm font-medium text-slate-600 underline">View assessments</Link>}>
+              <Card title="Released Assessment Results" actions={<Link href="/trainee/assessments" className="text-xs font-medium text-brand-dark hover:underline">View assessments</Link>}>
                 {data.released_results.length === 0 && <EmptyState title="No released results" description="Results appear after your trainer releases them." />}
                 <ul className="divide-y">
                   {data.released_results.map((result) => (
@@ -113,7 +128,7 @@ export default function TraineeDashboardPage() {
                 </ul>
               </Card>
 
-              <Card title="Competency Feedback" actions={<Link href="/trainee/competencies" className="text-sm font-medium text-slate-600 underline">View competencies</Link>}>
+              <Card title="Competency Feedback" actions={<Link href="/trainee/competencies" className="text-xs font-medium text-brand-dark hover:underline">View competencies</Link>}>
                 {data.competencies.length === 0 && <EmptyState title="No competency evaluations yet" />}
                 <ul className="divide-y">
                   {data.competencies.map((evaluation) => (

@@ -202,7 +202,7 @@ export default function AssessmentDetailPage() {
                         {question.options.map((option) => (
                           <li key={option} className="rounded border bg-slate-50 px-2 py-1">
                             {option}
-                            {correctAnswerValue(question) === option && <span className="ml-2 text-xs font-semibold text-emerald-600">correct</span>}
+                            {correctAnswerValue(question) === option && <span className="ml-2 text-xs font-semibold text-brand-dark">correct</span>}
                           </li>
                         ))}
                       </ul>
@@ -216,10 +216,10 @@ export default function AssessmentDetailPage() {
       </div>
 
       <Modal open={open} title={editing ? "Edit Question" : "Add Question"} onClose={() => setOpen(false)}
-        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="question-form" disabled={saving}>{saving ? "Saving..." : "Save Question"}</Button></>}
+        footer={<><Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" form="question-form" loading={saving}>{saving ? "Saving question" : "Save question"}</Button></>}
       >
         <form id="question-form" onSubmit={save} className="grid gap-4 sm:grid-cols-2">
-          {error && <p className="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && <p role="alert" className="sm:col-span-2 rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs leading-5 text-red-700">{error}</p>}
           <Field label="Question Text" required className="sm:col-span-2"><Textarea rows={3} required value={form.question_text} onChange={(e) => setForm({ ...form, question_text: e.target.value })} /></Field>
           <Field label="Question Type" required>
             <Select value={form.question_type} onChange={(e) => setForm({ ...form, question_type: e.target.value })}>
