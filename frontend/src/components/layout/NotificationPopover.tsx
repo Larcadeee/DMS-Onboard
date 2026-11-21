@@ -2,27 +2,40 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api/client";
+import { api, apiRequest } from "@/lib/api/client";
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/components/ui/Primitives";
 
 interface Notification {
   id: number;
   title: string;
-  message: string;
+  message: string | null;
   type: string;
   link?: string | null;
   read_at?: string | null;
   created_at: string;
 }
 
-export function NotificationPopover({ unreadCount }: { unreadCount: number }) {
+interface NotificationPage {
+  data: Notification[];
+}
+
+export function NotificationPopover({
+  unreadCount,
+  onUnreadCountChange,
+}: {
+  unreadCount: number;
+  onUnreadCountChange: (count: number) => void;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const popoverRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const requestInFlight = useRef(false);
+  const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
@@ -38,23 +51,62 @@ export function NotificationPopover({ unreadCount }: { unreadCount: number }) {
   }, []);
 
   const fetchNotifications = useCallback(async () => {
-    if (loading) return;
+    if (requestInFlight.current) return;
+
+    requestInFlight.current = true;
     setLoading(true);
+    setError("");
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    let timedOut = false;
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 15_000);
+
     try {
-      const result = await api.get<{ data: Notification[] }>("/api/v1/notifications?per_page=10");
-      setNotifications(result.data ?? []);
-    } catch {
-      setNotifications([]);
+      const result = await apiRequest(
+        "/api/v1/notifications?per_page=10",
+        { signal: controller.signal }
+      ) as { notifications?: NotificationPage; unread_count?: number };
+
+      if (!Array.isArray(result.notifications?.data)) {
+        throw new Error("The notification response was invalid. Please try again.");
+      }
+
+      setNotifications(result.notifications.data);
+      if (typeof result.unread_count === "number") {
+        onUnreadCountChange(result.unread_count);
+      }
+    } catch (err) {
+      if (timedOut) {
+        setError("Notifications took too long to load. Check your connection and retry.");
+      } else if (!controller.signal.aborted) {
+        setError(err instanceof Error ? err.message : "Unable to load notifications.");
+      }
     } finally {
-      setLoading(false);
+      window.clearTimeout(timeout);
+      if (controllerRef.current === controller) {
+        controllerRef.current = null;
+        requestInFlight.current = false;
+        setLoading(false);
+      }
     }
-  }, [loading]);
+  }, [onUnreadCountChange]);
 
   useEffect(() => {
     if (open) {
-      fetchNotifications();
+      void fetchNotifications();
     }
   }, [open, fetchNotifications]);
+
+  useEffect(() => () => {
+    const controller = controllerRef.current;
+    controllerRef.current = null;
+    requestInFlight.current = false;
+    controller?.abort();
+  }, []);
 
   const markAsRead = async (id: number) => {
     try {
@@ -62,8 +114,9 @@ export function NotificationPopover({ unreadCount }: { unreadCount: number }) {
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
       );
-    } catch {
-      // Ignore error
+      onUnreadCountChange(Math.max(0, unreadCount - 1));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to update notification.");
     }
   };
 
@@ -135,6 +188,17 @@ export function NotificationPopover({ unreadCount }: { unreadCount: number }) {
                 </svg>
                 Loading notifications...
               </div>
+            </div>
+          ) : error ? (
+            <div className="px-4 py-5 text-center" role="alert">
+              <p className="text-sm text-red-700">{error}</p>
+              <button
+                type="button"
+                onClick={() => void fetchNotifications()}
+                className="mt-3 text-xs font-medium text-brand hover:underline"
+              >
+                Retry
+              </button>
             </div>
           ) : notifications.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-muted">

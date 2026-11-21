@@ -10,7 +10,7 @@ const TRAINEE_PATHS = ["/trainee", "/notifications", "/profile", "/change-passwo
 
 const API_TARGET = process.env.API_PROXY_TARGET || "http://127.0.0.1:8000";
 const SESSION_COOKIE = process.env.API_SESSION_COOKIE || "cdrrmd-session";
-const PUBLIC_PAGES = ["/login"];
+const PUBLIC_PAGES = ["/login", "/register"];
 
 async function authenticatedUser(request: NextRequest): Promise<ProxyUser | null> {
   const cookies = request.headers.get("cookie") ?? "";
@@ -24,10 +24,6 @@ async function authenticatedUser(request: NextRequest): Promise<ProxyUser | null
       headers: {
         Accept: "application/json",
         Cookie: cookies,
-        // Sanctum treats a request as stateful (session-authenticated) when
-        // the Origin/Referer matches a configured stateful domain.
-        Origin: "http://localhost:3000",
-        Referer: "http://localhost:3000/",
       },
       cache: "no-store",
       signal: AbortSignal.timeout(3000),
@@ -51,9 +47,12 @@ export async function proxy(request: NextRequest) {
   const isPublic = PUBLIC_PAGES.includes(pathname);
   const user = await authenticatedUser(request);
 
-  if (!user) {
-    if (isPublic) return NextResponse.next();
+  // If user is not authenticated and on a public page, just let them stay
+  if (!user && isPublic) {
+    return NextResponse.next();
+  }
 
+  if (!user) {
     const loginUrl = new URL("/login", request.url);
     if (pathname !== "/") {
       loginUrl.searchParams.set("next", `${pathname}${search}`);
@@ -62,6 +61,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // If user IS authenticated and on a public page (/login), redirect to dashboard
   if (isPublic || pathname === "/") {
     return NextResponse.redirect(new URL(dashboardFor(user), request.url));
   }
@@ -72,11 +72,17 @@ export async function proxy(request: NextRequest) {
 
   const trainee = user.role?.slug === "etc_trainee";
 
-  if (trainee && !TRAINEE_PATHS.some((path) => pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL("/trainee/dashboard", request.url));
-  }
+  // /trainees (plural) is admin trainee management. /trainee/* (singular) is
+  // the trainee portal and must only be reachable by trainees.
+  const isTraineePortal = pathname === "/trainee" || pathname.startsWith("/trainee/");
+  const isAdminTrainees = pathname === "/trainees" || pathname.startsWith("/trainees/");
 
-  if (!trainee && pathname.startsWith("/trainee")) {
+  if (trainee) {
+    const allowed = TRAINEE_PATHS.some((path) => pathname.startsWith(path));
+    if (!allowed || isAdminTrainees) {
+      return NextResponse.redirect(new URL("/trainee/dashboard", request.url));
+    }
+  } else if (isTraineePortal && !isAdminTrainees) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

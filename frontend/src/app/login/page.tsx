@@ -59,16 +59,19 @@ export default function LoginPage() {
 
     setLoading(true);
     setError("");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15_000);
 
     try {
-      await initializeCsrf();
+      await initializeCsrf(controller.signal);
 
       await apiRequest("/api/v1/login", {
         method: "POST",
         body: JSON.stringify({ email: email.trim(), password }),
+        signal: controller.signal,
       });
 
-      const signedIn = await refresh();
+      const signedIn = await refresh(controller.signal);
 
       if (!signedIn) {
         setError("Your session could not be established. Enable cookies for this site and try again.");
@@ -78,13 +81,18 @@ export default function LoginPage() {
       router.replace(destinationFor(signedIn, next));
       router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unable to sign in.";
-      setError(
-        message === "The provided credentials do not match our records."
-          ? "Invalid email address or password."
-          : message
-      );
+      if (controller.signal.aborted) {
+        setError("Sign in timed out. Check your connection and try again.");
+      } else {
+        const message = err instanceof Error ? err.message : "Unable to sign in.";
+        setError(
+          message === "The provided credentials do not match our records."
+            ? "Invalid email address or password."
+            : message
+        );
+      }
     } finally {
+      window.clearTimeout(timeout);
       setLoading(false);
     }
   }
@@ -250,7 +258,7 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <Button type="submit" loading={loading} disabled={loading || authLoading || googleBusy} className="w-full">
+              <Button type="submit" loading={loading} disabled={loading || googleBusy} className="w-full">
                 {loading ? "Signing in" : "Sign in"}
               </Button>
             </form>

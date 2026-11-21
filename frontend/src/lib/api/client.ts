@@ -32,10 +32,11 @@ function getXsrfToken(): string | undefined {
   return decodeURIComponent(cookie.substring("XSRF-TOKEN=".length));
 }
 
-export async function initializeCsrf(): Promise<void> {
+export async function initializeCsrf(signal?: AbortSignal): Promise<void> {
   const response = await fetch(`${API_URL}/sanctum/csrf-cookie`, {
     method: "GET",
     credentials: "include",
+    signal,
     headers: {
       Accept: "application/json",
     },
@@ -73,7 +74,7 @@ export async function apiRequest(
   // A 419 means the CSRF token expired. Refresh it once and retry the request
   // so expired sessions/logins fail cleanly instead of blocking the user.
   if (response.status === 419) {
-    await initializeCsrf().catch(() => undefined);
+    await initializeCsrf(options.signal ?? undefined).catch(() => undefined);
     response = await fetch(`${API_URL}${endpoint}`, requestOptions(options));
   }
 

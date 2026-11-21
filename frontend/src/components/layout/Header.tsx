@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { api } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth";
 import { titleCase } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
@@ -34,32 +33,40 @@ function pageTitle(pathname: string): string {
 }
 
 export default function Header({
+  collapsed,
   onMenu,
   onCollapse,
 }: {
+  collapsed: boolean;
   onMenu: () => void;
   onCollapse: () => void;
 }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("mobile_menu_open") === "true" : false
+  );
   const [unread, setUnread] = useState(user?.unread_notifications ?? 0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setUnread(user?.unread_notifications ?? 0);
-  }, [user]);
+  }, [user?.unread_notifications]);
 
   useEffect(() => {
-    api.get<{ unread_count: number }>("/api/v1/notifications")
-      .then((result) => setUnread(result.unread_count))
-      .catch(() => undefined);
-  }, [pathname]);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mobile_menu_open", String(menuOpen));
+    }
+  }, [menuOpen]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
+        // Also persist when closing
+        if (typeof window !== "undefined") {
+          localStorage.setItem("mobile_menu_open", "false");
+        }
       }
     }
 
@@ -85,8 +92,8 @@ export default function Header({
           type="button"
           onClick={onCollapse}
           className="hidden rounded-md p-2 text-muted transition-colors hover:bg-canvas hover:text-ink lg:block"
-          aria-label="Collapse navigation"
-          title="Collapse sidebar"
+          aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
             <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
@@ -99,7 +106,7 @@ export default function Header({
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
-        <NotificationPopover unreadCount={unread} />
+        <NotificationPopover unreadCount={unread} onUnreadCountChange={setUnread} />
 
         <div className="relative" ref={menuRef}>
           <button

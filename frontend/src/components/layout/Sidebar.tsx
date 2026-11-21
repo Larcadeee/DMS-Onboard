@@ -54,6 +54,29 @@ const adminGroups: NavGroup[] = [
   },
 ];
 
+const traineeGroups: NavGroup[] = [
+  {
+    title: "My Portal",
+    items: [
+      { name: "Dashboard", href: "/trainee/dashboard", permission: "dashboard.view" },
+      { name: "My Program", href: "/trainee/program", permission: "programs.view" },
+      { name: "Learning Materials", href: "/trainee/materials", permission: "materials.view" },
+      { name: "Training Schedule", href: "/trainee/schedule", permission: "sessions.view" },
+      { name: "Assessments", href: "/trainee/assessments", permission: "assessments.view" },
+      { name: "Competencies", href: "/trainee/competencies", permission: "competencies.view" },
+      { name: "Attendance", href: "/trainee/attendance", permission: "attendance.view" },
+      { name: "Training History", href: "/trainee/history", permission: "progress.view" },
+    ],
+  },
+  {
+    title: "Personal",
+    items: [
+      { name: "Notifications", href: "/notifications" },
+      { name: "Profile", href: "/profile" },
+    ],
+  },
+];
+
 const icons: Record<string, React.ReactNode> = {
   dashboard: (
     <>
@@ -216,8 +239,10 @@ export default function Sidebar({
   collapsed: boolean;
 }) {
   const pathname = usePathname();
-  const { can } = useAuth();
-  const groups = adminGroups;
+  const { user, can } = useAuth();
+  const isTrainee = user?.role?.slug === "etc_trainee";
+
+  const groups = isTrainee ? traineeGroups : adminGroups;
 
   return (
     <>

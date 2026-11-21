@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/components/ui/Toast";
+import { SidebarStateProvider } from "@/components/layout/SidebarState";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,9 +38,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <ToastProvider>
-            <Suspense fallback={null}>{children}</Suspense>
-          </ToastProvider>
+          <SidebarStateProvider>
+            <ToastProvider>
+              <Suspense fallback={null}>{children}</Suspense>
+            </ToastProvider>
+          </SidebarStateProvider>
         </AuthProvider>
       </body>
     </html>

@@ -13,7 +13,7 @@ import { Badge, Button, Card, EmptyState, ErrorState, LoadingSkeleton, PageHeade
 interface Notification {
   id: number;
   title: string;
-  message: string;
+  message: string | null;
   type: string;
   link?: string;
   read_at?: string;
@@ -24,7 +24,10 @@ export default function NotificationsPage() {
   const { refresh } = useAuth();
   const toast = useToast();
   const [page, setPage] = useState(1);
-  const { data, loading, error, refetch } = useApi<{ notifications: Paginated<Notification>; unread_count: number }>(`/api/v1/notifications?page=${page}`);
+  const { data, loading, error, refetch } = useApi<{ notifications: Paginated<Notification>; unread_count: number }>(
+    `/api/v1/notifications?page=${page}`,
+    15_000
+  );
   const [acting, setActing] = useState(false);
 
   async function markRead(notification: Notification) {

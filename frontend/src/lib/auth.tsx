@@ -10,14 +10,14 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { api, ApiError, AUTH_UNAUTHORIZED_EVENT } from "@/lib/api/client";
+import { api, apiRequest, ApiError, AUTH_UNAUTHORIZED_EVENT } from "@/lib/api/client";
 import { clearApiCache } from "@/lib/hooks";
 import type { AuthUser } from "@/lib/format";
 
 interface AuthState {
   user: AuthUser | null;
   loading: boolean;
-  refresh: () => Promise<AuthUser | null>;
+  refresh: (signal?: AbortSignal) => Promise<AuthUser | null>;
   can: (permission: string) => boolean;
   logout: () => Promise<void>;
 }
@@ -31,12 +31,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(async (): Promise<AuthUser | null> => {
+  const refresh = useCallback(async (signal?: AbortSignal): Promise<AuthUser | null> => {
     try {
-      const result = await api.get<{ user: AuthUser }>("/api/v1/user");
+      const result = await apiRequest(
+        "/api/v1/user",
+        signal ? { signal } : {}
+      ) as { user: AuthUser };
       setUser(result.user);
       return result.user;
     } catch (error) {
+      if (signal?.aborted) {
+        throw signal.reason ?? error;
+      }
+
       if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
         setUser(null);
       }
@@ -65,15 +72,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [router]
   );
 
-  // A 401 from any API call means the session is no longer valid. Clear the
-  // local authentication state and require the user to sign in again.
+  // The initial session probe is expected to return 401 for signed-out users.
+  // Only treat a 401 as expiration after an authenticated user is established.
   useEffect(() => {
-    const onUnauthorized = () => redirectToLogin(true);
+    const onUnauthorized = () => {
+      if (user) redirectToLogin(true);
+    };
 
     window.addEventListener(AUTH_UNAUTHORIZED_EVENT, onUnauthorized);
 
     return () => window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, onUnauthorized);
-  }, [redirectToLogin]);
+  }, [redirectToLogin, user]);
 
   // Revalidate the session when the user returns to the application so an
   // expired session is detected before any protected data is trusted.

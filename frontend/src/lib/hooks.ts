@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "@/lib/api/client";
+import { apiRequest } from "@/lib/api/client";
 
 interface ApiState<T> {
   data: T | null;
@@ -17,17 +17,26 @@ export function clearApiCache(): void {
   responseCache.clear();
 }
 
-export function useApi<T>(endpoint: string | null): ApiState<T> {
+export function useApi<T>(endpoint: string | null, timeoutMs?: number): ApiState<T> {
   const [data, setData] = useState<T | null>(() => (endpoint ? ((responseCache.get(endpoint) as T | undefined) ?? null) : null));
   const [loading, setLoading] = useState(() => Boolean(endpoint) && !responseCache.has(endpoint as string));
   const [error, setError] = useState("");
   const mounted = useRef(true);
   const requestId = useRef(0);
+  const controller = useRef<AbortController | null>(null);
+  const automaticEndpoint = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      const pendingController = controller.current;
+      queueMicrotask(() => {
+        if (!mounted.current) {
+          requestId.current += 1;
+          pendingController?.abort();
+        }
+      });
     };
   }, []);
 
@@ -41,6 +50,16 @@ export function useApi<T>(endpoint: string | null): ApiState<T> {
 
     const cached = responseCache.get(endpoint) as T | undefined;
     const currentRequest = ++requestId.current;
+    controller.current?.abort();
+    const requestController = new AbortController();
+    controller.current = requestController;
+    let timedOut = false;
+    const timeout = timeoutMs
+      ? window.setTimeout(() => {
+          timedOut = true;
+          requestController.abort();
+        }, timeoutMs)
+      : undefined;
 
     if (cached !== undefined) {
       setData(cached);
@@ -52,7 +71,7 @@ export function useApi<T>(endpoint: string | null): ApiState<T> {
     setError("");
 
     try {
-      const result = await api.get<T>(endpoint);
+      const result = await apiRequest(endpoint, { signal: requestController.signal }) as T;
       responseCache.set(endpoint, result);
 
       if (mounted.current && currentRequest === requestId.current) {
@@ -60,18 +79,27 @@ export function useApi<T>(endpoint: string | null): ApiState<T> {
       }
     } catch (err) {
       if (mounted.current && currentRequest === requestId.current) {
-        setError(err instanceof Error ? err.message : "Unable to load data.");
+        setError(
+          timedOut
+            ? "The request timed out. Check your connection and try again."
+            : err instanceof Error
+              ? err.message
+              : "Unable to load data."
+        );
       }
     } finally {
+      if (timeout !== undefined) window.clearTimeout(timeout);
       if (mounted.current && currentRequest === requestId.current) {
         setLoading(false);
       }
     }
-  }, [endpoint]);
+  }, [endpoint, timeoutMs]);
 
   useEffect(() => {
+    if (automaticEndpoint.current === endpoint) return;
+    automaticEndpoint.current = endpoint;
     void load();
-  }, [load]);
+  }, [endpoint, load]);
 
   return { data, loading, error, refetch: () => load(), setData };
 }

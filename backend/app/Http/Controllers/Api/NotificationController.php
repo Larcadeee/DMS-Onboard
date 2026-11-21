@@ -4,33 +4,38 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
+use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = Notification::where('user_id', request()->user()->id)
+        $user = $request->user();
+        $perPage = $request->integer('per_page', 25);
+        $perPage = min(max($perPage, 1), 100);
+
+        $notifications = $user->notifications()
             ->orderByDesc('created_at')
-            ->paginate(25);
+            ->paginate($perPage);
 
         return response()->json([
             'notifications' => $notifications,
-            'unread_count' => Notification::where('user_id', request()->user()->id)->whereNull('read_at')->count(),
+            'unread_count' => $user->notifications()->whereNull('read_at')->count(),
         ]);
     }
 
-    public function markRead(Notification $notification)
+    public function markRead(Request $request, Notification $notification)
     {
-        abort_unless($notification->user_id === request()->user()->id, 403);
+        abort_unless($notification->user_id === $request->user()->id, 403);
 
         $notification->update(['read_at' => now()]);
 
         return response()->json(['message' => 'Notification marked as read.']);
     }
 
-    public function markAllRead()
+    public function markAllRead(Request $request)
     {
-        Notification::where('user_id', request()->user()->id)
+        $request->user()->notifications()
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 

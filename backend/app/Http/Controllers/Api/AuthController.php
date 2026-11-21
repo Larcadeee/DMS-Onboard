@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Models\Role;
+use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -39,7 +43,8 @@ class AuthController extends Controller
             $request->session()->regenerateToken();
 
             return response()->json([
-                'message' => 'Your account is inactive or has no active role.',
+                'message' => $user->statusMessage(),
+                'account_status' => $user->account_status,
             ], 403);
         }
 
@@ -51,6 +56,47 @@ class AuthController extends Controller
             'message' => 'Login successful.',
             'user' => $this->presentUser($user),
         ]);
+    }
+
+    /**
+     * Register a new user account.
+     *
+     * New accounts are created in a PENDING state and require administrator
+     * approval before they can sign in or access protected pages.
+     */
+    public function register(RegisterRequest $request, AuditLogger $audit)
+    {
+        $data = $request->validated();
+
+        $role = Role::where('slug', 'etc_trainee')->first();
+
+        $user = User::create([
+            'name' => trim("{$data['first_name']} {$data['last_name']}"),
+            'first_name' => $data['first_name'],
+            'middle_name' => $data['middle_name'] ?? null,
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+            'contact_number' => $data['contact_number'] ?? null,
+            'role_id' => $role?->id,
+            'password' => Hash::make($data['password']),
+            'account_status' => User::STATUS_PENDING,
+            'is_active' => false,
+            'must_change_password' => false,
+        ]);
+
+        $audit->record(
+            $request,
+            'user.registered',
+            'User',
+            $user->id,
+            'Registration submitted by user.',
+            ['email' => $user->email, 'role' => $role?->slug]
+        );
+
+        return response()->json([
+            'message' => 'Your registration has been submitted successfully. It is pending administrator approval before you can sign in.',
+            'account_status' => User::STATUS_PENDING,
+        ], 201);
     }
 
     /**

@@ -5,15 +5,16 @@ import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import AuthGuard from "./AuthGuard";
+import { useSidebarState } from "./SidebarState";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { collapsed, toggleCollapsed } = useSidebarState();
 
   return (
     <AuthGuard>
@@ -28,7 +29,11 @@ export default function DashboardLayout({
         <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} collapsed={collapsed} />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header onMenu={() => setMobileOpen(true)} onCollapse={() => setCollapsed((value) => !value)} />
+          <Header
+            collapsed={collapsed}
+            onMenu={() => setMobileOpen(true)}
+            onCollapse={toggleCollapsed}
+          />
 
           <main id="main-content" className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
             <div key={pathname} className="page-transition mx-auto w-full max-w-[1500px]">
