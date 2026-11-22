@@ -48,8 +48,8 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-        size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
+        "ui-button inline-flex shrink-0 items-center justify-center gap-2 rounded-md font-medium disabled:cursor-not-allowed disabled:opacity-50",
+        size === "sm" ? "h-11 px-3 text-xs" : "h-11 px-4 text-sm",
         variants[variant],
         className
       )}
@@ -80,7 +80,7 @@ export function PageHeader({
             {breadcrumb}
           </p>
         )}
-        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-[1.7rem]">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">{title}</h1>
         {description && <p className="mt-1.5 max-w-3xl text-sm leading-6 text-muted">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2 sm:justify-end">{actions}</div>}
@@ -106,7 +106,7 @@ export function Card({
       {(title || actions) && (
         <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
           <div className="min-w-0">
-            {title && <h2 className="text-sm font-semibold tracking-tight text-ink">{title}</h2>}
+            {title && <h2 className="text-[15px] font-semibold tracking-tight text-ink">{title}</h2>}
             {description && <p className="mt-0.5 text-xs leading-5 text-muted">{description}</p>}
           </div>
           {actions}
@@ -330,7 +330,7 @@ export function Field({
       {label && (
         <span className="mb-1.5 block text-xs font-semibold text-ink-soft">
           {label}
-          {required && <span className="text-red-500"> *</span>}
+          {required && <span className="text-red-700"> *</span>}
         </span>
       )}
       {children}
@@ -344,11 +344,11 @@ const controlClass =
   "w-full rounded-md border border-line-strong bg-surface px-3 text-sm text-ink outline-none transition-colors placeholder:text-faint hover:border-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/15 disabled:cursor-not-allowed disabled:bg-canvas disabled:text-muted";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={cn(controlClass, "h-10", props.className)} />;
+  return <input {...props} className={cn(controlClass, "h-11", props.className)} />;
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select {...props} className={cn(controlClass, "h-10 pr-8", props.className)} />;
+  return <select {...props} className={cn(controlClass, "h-11 pr-8", props.className)} />;
 }
 
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
@@ -374,7 +374,7 @@ export function SearchInput({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className={cn(controlClass, "h-10 pl-9 pr-3")}
+        className={cn(controlClass, "h-11 pl-9 pr-3")}
         aria-label={placeholder}
       />
     </div>

@@ -81,7 +81,7 @@ export default function NotificationsPage() {
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-slate-900">{notification.title}</p>
                     <Badge status={notification.type === "alert" ? "pending" : notification.type === "success" ? "active" : "scheduled"}>{notification.type}</Badge>
-                    {!notification.read_at && <span className="h-2 w-2 rounded-full bg-canvas0" aria-label="Unread" />}
+                    {!notification.read_at && <span className="h-2 w-2 rounded-full bg-brand" aria-label="Unread" />}
                   </div>
                   <p className="mt-1 text-sm text-slate-600">{notification.message}</p>
                   <p className="mt-1 text-xs text-slate-400">{formatDateTime(notification.created_at)}</p>

@@ -216,7 +216,7 @@ export default function ProfilePage() {
                     <Field label="Contact Number">
                       <Input
                         maxLength={50}
-                        placeholder="e.g. +63 917 555 1234"
+                        placeholder="Enter your mobile number"
                         value={form.contact_number}
                         onChange={(e) => setForm({ ...form, contact_number: e.target.value })}
                       />

@@ -294,7 +294,7 @@ export default function Sidebar({
                         title={collapsed ? item.name : undefined}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "relative flex h-9 items-center gap-3 rounded-md px-2.5 text-[13px] transition-colors",
+                          "relative flex h-10 items-center gap-3 rounded-md px-2.5 text-[13px] transition-colors",
                           active ? "bg-white/[0.08] font-medium text-white" : "text-white/60 hover:bg-white/[0.05] hover:text-white",
                           collapsed && "lg:justify-center lg:px-0"
                         )}

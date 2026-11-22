@@ -22,6 +22,10 @@ export const metadata: Metadata = {
     template: "%s | CDRRMD DMS",
   },
   description: "New Hire Onboarding Management System for the Butuan City Disaster Risk Reduction and Management Office.",
+  other: {
+    "page-type": "software",
+    "site-kind": "software",
+  },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -33,9 +37,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-type="software"
+      data-site-kind="software"
+      data-radius="soft"
+      data-motion="ui"
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="stylesheet" href="/assets/motion/motion.css" />
+      </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <SidebarStateProvider>

@@ -47,7 +47,7 @@ export function DataTable<T>({
               <th
                 key={column.key}
                 scope="col"
-                className={`whitespace-nowrap border-b border-line pb-2.5 pr-4 text-[11px] font-semibold uppercase tracking-[0.06em] text-muted ${column.className ?? ""}`}
+                className={`whitespace-nowrap border-b border-line pb-2.5 pr-4 text-xs font-medium text-muted ${column.className ?? ""}`}
               >
                 {column.label}
               </th>

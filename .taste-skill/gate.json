@@ -1,0 +1,947 @@
+{
+ "start": "2026-11-22T09:35:02.473Z",
+ "round": 1,
+ "idle": 0,
+ "errors": 0,
+ "status": "fail",
+ "history": [
+  {
+   "at": "2026-11-22T09:44:37.636Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 25,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": null,
+  "url": "http://127.0.0.1:3000/login",
+  "root": null,
+  "kind": "software",
+  "category": "onboarding management software",
+  "primary": "Sign in",
+  "rounds": 3,
+  "start": "2026-11-22T09:35:02.473Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "30e162ed1870003a:da39a3ee",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "30e162ed1870003a",
+ "page": "http://127.0.0.1:3000/login",
+ "found": {
+  "fails": [
+   {
+    "check": "no-visual",
+    "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen \"Onboarding management sign in\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "main.min-h-screen.bg-surface > section.grid.min-h-screen \"Onboarding management sign in\""
+    ]
+   },
+   {
+    "check": "nesting",
+    "where": "div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid > div.rounded-md.border:nth-of-type(1) \"Program\"",
+    "msg": "3 boxes deep: section.hidden.flex-col > div.mt-8.max-w-md > div.rounded-md.border:nth-of-type(1) (text in a box in a box)",
+    "fix": "two levels at most: a card holds a lit picture (no lines, dots or plain box behind the UI), the picture holds the UI",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "nesting"
+    ],
+    "wheres": [
+     "div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid > div.rounded-md.border:nth-of-type(1) \"Program\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "script:nth-of-type(5) > nextjs-portal",
+    "msg": "Tab stop 6, nextjs-portal \"\": the focus lands on something you cannot see",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "script:nth-of-type(5) > nextjs-portal"
+    ]
+   },
+   {
+    "check": "moment-none",
+    "where": "(the page)",
+    "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+    "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "moment-none"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen \"CDRRMD DMSDispatch Management SectionEme\"",
+    "msg": "the content of section 1 runs 56px from the left and 848px from the right: 56 and 848px are not one margin; the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+    "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "main.min-h-screen.bg-surface > section.grid.min-h-screen \"CDRRMD DMSDispatch Management SectionEme\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen > section.hidden.flex-col > div.wrap.flex \"CDRRMD DMSDispatch Management Section\"",
+    "msg": "the .wrap has z-index auto beside a layer: 1 or more (and 1 more like it: \"CDRRMD DMSDispatch Manag\") (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "main.min-h-screen.bg-surface > section.grid.min-h-screen > section.hidden.flex-col > div.wrap.flex \"CDRRMD DMSDispatch Management Section\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "input#email",
+    "msg": "the <input> runs 844-1244px, outside the container lines of section 1 at 56-592px: full width is for background layers and grounds only (SR-6)",
+    "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "input#email"
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "input#password",
+    "msg": "the <input> runs 844-1244px, outside the container lines of section 1 at 56-592px: full width is for background layers and grounds only (and 17 more like it: input#email, input#password, \"Sign in\") (SR-6)",
+    "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "input#password"
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.font-semibold.uppercase \"Secure access\"",
+    "msg": "1 text block starts on a left line at x 844, 788px from the container's left: text starts on the container's left, or on one split line (x 289, 336, 383) (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.font-semibold.uppercase \"Secure access\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > h1.mt-2.text-2xl \"Onboarding management sign in\"",
+    "msg": "the h1 starts 788px right of the container's left: every h1 and h2 starts on it, 2px either way (and 2 more like it: x 104, x 73) (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > h1.mt-2.text-2xl \"Onboarding management sign in\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section.hidden.flex-col > div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid \"ProgramAttendanceCompetency\"",
+    "msg": "a row of 3 items: its first item starts at 73px, the container's left line at 56px; its last item ends at 487px, the container's right line at 592px (2px either way) (SR-7)",
+    "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section.hidden.flex-col > div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid \"ProgramAttendanceCompetency\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "input#email",
+    "msg": "the <input> ends at 1244px, past the container's right line at 592px (SR-7)",
+    "fix": "end it at the container's right line",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "input#email"
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "input#password",
+    "msg": "the <input> ends at 1244px, past the container's right line at 592px (SR-7)",
+    "fix": "end it at the container's right line",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "input#password"
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.mt-2.text-sm \"Use the account issued by the Dispatch M\"",
+    "msg": "\"Use the account issued by the Di\" ends at 1240px, past the container's right line at 592px (and 11 more like it: \"Show\", \"Having trouble signing i\", \"Onboarding management si\") (SR-7)",
+    "fix": "end it at the container's right line",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.mt-2.text-sm \"Use the account issued by the Dispatch M\""
+    ]
+   },
+   {
+    "check": "bleed-one-side",
+    "where": "section.grid.min-h-screen section.hidden.flex-col \"CDRRMD DMSDispatch Management Se\"",
+    "msg": "runs from the left viewport edge to x 648; the right side stays at 848 from the edge",
+    "fix": "bleed the visual to both edges or keep it on the .wrap lines",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "bleed-one-side"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen section.hidden.flex-col \"CDRRMD DMSDispatch Management Se\""
+    ]
+   },
+   {
+    "check": "bleed-one-side",
+    "where": "section.grid.min-h-screen section.flex.items-center \"CDRRMD DMSOnboarding ManagementS\"",
+    "msg": "runs from x 648 out to the right viewport edge; the left side stays at 56",
+    "fix": "bleed the visual to both edges or keep it on the .wrap lines",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "bleed-one-side"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen section.flex.items-center \"CDRRMD DMSOnboarding ManagementS\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.text-[11px].font-semibold \"Secure access\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.text-[11px].font-semibold \"Secure access\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen h1.mt-2.text-2xl \"Onboarding management sign in\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen h1.mt-2.text-2xl \"Onboarding management sign in\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.mt-2.text-sm \"Use the account issued by the Di\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.mt-2.text-sm \"Use the account issued by the Di\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen form.mt-6.space-y-4 \"Email address *Password *ShowSig\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen form.mt-6.space-y-4 \"Email address *Password *ShowSig\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.mt-5.text-center \"New trainee? Create an account\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.mt-5.text-center \"New trainee? Create an account\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.mt-6.border-t \"Having trouble signing in? Conta\"",
+    "msg": "x 844 to 1244, the page runs 56 to 592",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.mt-6.border-t \"Having trouble signing in? Conta\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen div.mb-8.flex \"CDRRMD DMSOnboarding Management\"",
+    "msg": "x 20 to 370, the page runs 0 to 0",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen div.mb-8.flex \"CDRRMD DMSOnboarding Management\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.text-sm.font-semibold \"CDRRMD DMS\"",
+    "msg": "x 68 to 195.8, the page runs 0 to 0",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.text-sm.font-semibold \"CDRRMD DMS\""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "section.grid.min-h-screen p.text-[11px].text-muted \"Onboarding Management\"",
+    "msg": "x 68 to 195.8, the page runs 0 to 0",
+    "fix": "keep it inside the .wrap; nothing past the right edge",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "section.grid.min-h-screen p.text-[11px].text-muted \"Onboarding Management\""
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "assets",
+    "where": "(the page)",
+    "msg": "the data file api/v1/user did not load (401)",
+    "fix": "fix the path, or remove the reference",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-length",
+    "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen \"Onboarding management sign in\"",
+    "msg": "the page; 82 words a screen across the page (82 words in 1 screens): a tech page says it in about 80 or fewer",
+    "fix": "cut every section to its heading, one line and the product UI: the UI says the rest; no second paragraph, no list of feature sentences",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "empty-area",
+    "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen > section.flex.items-center \"Onboarding management sign in\"",
+    "msg": "40% of the section is empty: 160px above its first content, 176px under its last (p.mt-6.border-t), in its 820px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "skip-link",
+    "where": "input#email",
+    "msg": "the first Tab stop is \"input#email\", not a skip link: a keyboard user tabs through the whole nav on every visit",
+    "fix": "add the starter's skip link as the header's first child: <a class=\"skip-link\" href=\"#top\">Skip to content</a>",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "share-meta",
+    "where": "head",
+    "msg": "the head lacks og:title, og:description, og:image, twitter:card, theme-color: a shared link shows no picture or title of its own",
+    "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "form-fields",
+    "where": "input#email",
+    "msg": "the email field lacks autocomplete=\"email\": the phone shows the wrong keyboard and nothing fills it in",
+    "fix": "give each field its type, autocomplete and inputmode, never block paste or disable the button before a submit, and add the status line (references/system.md, Forms)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "form-fields",
+    "where": "section.grid.min-h-screen > section.flex.items-center:nth-of-type(2) > div.wrap.w-full > form.mt-6.space-y-4",
+    "msg": "the form has no status line (role=\"status\"): sending, sent and errors are never read out",
+    "fix": "give each field its type, autocomplete and inputmode, never block paste or disable the button before a submit, and add the status line (references/system.md, Forms)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "orphan",
+    "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > h1.mt-2.text-2xl \"Onboarding management sign in\"",
+    "msg": "its last line holds only \"in\"",
+    "fix": "rebalance the text (text-wrap: pretty, or a shorter line) so the last line holds more than one short word",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 51,
+   "layout": 14
+  }
+ },
+ "open": [
+  {
+   "check": "no-visual",
+   "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen \"Onboarding management sign in\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "main.min-h-screen.bg-surface > section.grid.min-h-screen \"Onboarding management sign in\""
+   ]
+  },
+  {
+   "check": "nesting",
+   "where": "div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid > div.rounded-md.border:nth-of-type(1) \"Program\"",
+   "msg": "3 boxes deep: section.hidden.flex-col > div.mt-8.max-w-md > div.rounded-md.border:nth-of-type(1) (text in a box in a box)",
+   "fix": "two levels at most: a card holds a lit picture (no lines, dots or plain box behind the UI), the picture holds the UI",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "nesting"
+   ],
+   "wheres": [
+    "div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid > div.rounded-md.border:nth-of-type(1) \"Program\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "script:nth-of-type(5) > nextjs-portal",
+   "msg": "Tab stop 6, nextjs-portal \"\": the focus lands on something you cannot see",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "script:nth-of-type(5) > nextjs-portal"
+   ]
+  },
+  {
+   "check": "moment-none",
+   "where": "(the page)",
+   "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+   "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "moment-none"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen \"CDRRMD DMSDispatch Management SectionEme\"",
+   "msg": "the content of section 1 runs 56px from the left and 848px from the right: 56 and 848px are not one margin; the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+   "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "main.min-h-screen.bg-surface > section.grid.min-h-screen \"CDRRMD DMSDispatch Management SectionEme\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "main.min-h-screen.bg-surface > section.grid.min-h-screen > section.hidden.flex-col > div.wrap.flex \"CDRRMD DMSDispatch Management Section\"",
+   "msg": "the .wrap has z-index auto beside a layer: 1 or more (and 1 more like it: \"CDRRMD DMSDispatch Manag\") (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "main.min-h-screen.bg-surface > section.grid.min-h-screen > section.hidden.flex-col > div.wrap.flex \"CDRRMD DMSDispatch Management Section\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "input#email",
+   "msg": "the <input> runs 844-1244px, outside the container lines of section 1 at 56-592px: full width is for background layers and grounds only (SR-6)",
+   "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "input#email"
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "input#password",
+   "msg": "the <input> runs 844-1244px, outside the container lines of section 1 at 56-592px: full width is for background layers and grounds only (and 17 more like it: input#email, input#password, \"Sign in\") (SR-6)",
+   "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "input#password"
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.font-semibold.uppercase \"Secure access\"",
+   "msg": "1 text block starts on a left line at x 844, 788px from the container's left: text starts on the container's left, or on one split line (x 289, 336, 383) (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.font-semibold.uppercase \"Secure access\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > h1.mt-2.text-2xl \"Onboarding management sign in\"",
+   "msg": "the h1 starts 788px right of the container's left: every h1 and h2 starts on it, 2px either way (and 2 more like it: x 104, x 73) (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > h1.mt-2.text-2xl \"Onboarding management sign in\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section.hidden.flex-col > div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid \"ProgramAttendanceCompetency\"",
+   "msg": "a row of 3 items: its first item starts at 73px, the container's left line at 56px; its last item ends at 487px, the container's right line at 592px (2px either way) (SR-7)",
+   "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section.hidden.flex-col > div.wrap.w-full > div.mt-8.max-w-md > div.mt-3.grid \"ProgramAttendanceCompetency\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "input#email",
+   "msg": "the <input> ends at 1244px, past the container's right line at 592px (SR-7)",
+   "fix": "end it at the container's right line",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "input#email"
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "input#password",
+   "msg": "the <input> ends at 1244px, past the container's right line at 592px (SR-7)",
+   "fix": "end it at the container's right line",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "input#password"
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.mt-2.text-sm \"Use the account issued by the Dispatch M\"",
+   "msg": "\"Use the account issued by the Di\" ends at 1240px, past the container's right line at 592px (and 11 more like it: \"Show\", \"Having trouble signing i\", \"Onboarding management si\") (SR-7)",
+   "fix": "end it at the container's right line",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen > section.flex.items-center > div.wrap.w-full > p.mt-2.text-sm \"Use the account issued by the Dispatch M\""
+   ]
+  },
+  {
+   "check": "bleed-one-side",
+   "where": "section.grid.min-h-screen section.hidden.flex-col \"CDRRMD DMSDispatch Management Se\"",
+   "msg": "runs from the left viewport edge to x 648; the right side stays at 848 from the edge",
+   "fix": "bleed the visual to both edges or keep it on the .wrap lines",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "bleed-one-side"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen section.hidden.flex-col \"CDRRMD DMSDispatch Management Se\""
+   ]
+  },
+  {
+   "check": "bleed-one-side",
+   "where": "section.grid.min-h-screen section.flex.items-center \"CDRRMD DMSOnboarding ManagementS\"",
+   "msg": "runs from x 648 out to the right viewport edge; the left side stays at 56",
+   "fix": "bleed the visual to both edges or keep it on the .wrap lines",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "bleed-one-side"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen section.flex.items-center \"CDRRMD DMSOnboarding ManagementS\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.text-[11px].font-semibold \"Secure access\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.text-[11px].font-semibold \"Secure access\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen h1.mt-2.text-2xl \"Onboarding management sign in\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen h1.mt-2.text-2xl \"Onboarding management sign in\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.mt-2.text-sm \"Use the account issued by the Di\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.mt-2.text-sm \"Use the account issued by the Di\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen form.mt-6.space-y-4 \"Email address *Password *ShowSig\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen form.mt-6.space-y-4 \"Email address *Password *ShowSig\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.mt-5.text-center \"New trainee? Create an account\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.mt-5.text-center \"New trainee? Create an account\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.mt-6.border-t \"Having trouble signing in? Conta\"",
+   "msg": "x 844 to 1244, the page runs 56 to 592",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.mt-6.border-t \"Having trouble signing in? Conta\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen div.mb-8.flex \"CDRRMD DMSOnboarding Management\"",
+   "msg": "x 20 to 370, the page runs 0 to 0",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen div.mb-8.flex \"CDRRMD DMSOnboarding Management\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.text-sm.font-semibold \"CDRRMD DMS\"",
+   "msg": "x 68 to 195.8, the page runs 0 to 0",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.text-sm.font-semibold \"CDRRMD DMS\""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "section.grid.min-h-screen p.text-[11px].text-muted \"Onboarding Management\"",
+   "msg": "x 68 to 195.8, the page runs 0 to 0",
+   "fix": "keep it inside the .wrap; nothing past the right edge",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "section.grid.min-h-screen p.text-[11px].text-muted \"Onboarding Management\""
+   ]
+  }
+ ],
+ "waived": [],
+ "warnCount": 8,
+ "at": "2026-11-22T09:44:37.639Z"
+}

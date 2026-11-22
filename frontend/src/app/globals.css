@@ -11,8 +11,8 @@
   --faint: #a3a3a3;
   --line: #e5e5e5;
   --line-strong: #d4d4d4;
-  --brand: #16a34a;
-  --brand-dark: #15803d;
+  --brand: #15803d;
+  --brand-dark: #166534;
   --brand-soft: #f0fdf4;
   --warning: #b45309;
   --danger: #dc2626;
@@ -69,6 +69,12 @@ html {
   scroll-behavior: smooth;
 }
 
+.wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
 body {
   min-height: 100vh;
   background: var(--canvas);
@@ -86,6 +92,25 @@ body {
 :focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+.ui-button {
+  transition:
+    transform 120ms cubic-bezier(.2, .8, .2, 1),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+
+  .ui-button:not(:disabled):active {
+    transform: translateY(1px) scale(.985);
+  }
 }
 
 a,

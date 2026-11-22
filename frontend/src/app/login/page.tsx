@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiRequest, initializeCsrf } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth";
 import { Button, Field, Input } from "@/components/ui/Primitives";
+import AuthLayout from "@/components/auth/AuthLayout";
 import { GoogleSignIn, isGoogleSignInConfigured } from "@/components/auth/GoogleSignIn";
 import type { AuthUser } from "@/lib/format";
 
@@ -132,64 +133,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-surface">
-      <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <section className="hidden flex-col justify-between bg-ink px-10 py-12 text-white lg:flex xl:px-14">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="CDRRMD" className="h-9 w-9 rounded-md" aria-hidden="true" />
-            <div>
-              <p className="text-sm font-semibold tracking-tight">CDRRMD DMS</p>
-              <p className="text-[11px] text-white/45">Dispatch Management Section</p>
-            </div>
-          </div>
-
-          <div className="max-w-md">
-            <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/45">
-              <span className="h-px w-5 bg-brand" aria-hidden="true" />
-              Emergency Telecommunicator Onboarding
-            </p>
-            <h2 className="text-4xl font-semibold leading-[1.15] tracking-tight xl:text-[2.75rem]">
-              Prepared people.
-              <br />
-              Clearer response.
-            </h2>
-            <p className="mt-5 max-w-sm text-sm leading-6 text-white/55">
-              One workspace for onboarding, training, assessment and competency validation across the Dispatch Management Section.
-            </p>
-
-            <ol className="mt-9 space-y-4 border-l border-white/15 pl-5 text-sm">
-              <li className="relative text-white/70">
-                <span className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-ink bg-brand" aria-hidden="true" />
-                Structured onboarding programs
-              </li>
-              <li className="relative text-white/70">
-                <span className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-ink bg-white/30" aria-hidden="true" />
-                Attendance-driven progress tracking
-              </li>
-              <li className="relative text-white/70">
-                <span className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-ink bg-white/30" aria-hidden="true" />
-                Verified competency and completion records
-              </li>
-            </ol>
-          </div>
-
-          <p className="text-[11px] leading-5 text-white/30">
-            Butuan City Disaster Risk Reduction and Management Office
-          </p>
-        </section>
-
-        <section className="flex items-center justify-center px-5 py-10 sm:px-10">
-          <div className="w-full max-w-[400px]">
-            <div className="mb-8 flex items-center gap-3 lg:hidden">
-              <img src="/logo.png" alt="CDRRMD" className="h-9 w-9 rounded-md" aria-hidden="true" />
-              <div>
-                <p className="text-sm font-semibold tracking-tight text-ink">CDRRMD DMS</p>
-                <p className="text-[11px] text-muted">Onboarding Management</p>
-              </div>
-            </div>
-
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand">Secure access</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">Sign in to your account</h1>
+    <AuthLayout>
+            <h1 className="text-2xl font-semibold tracking-tight text-ink">Sign in</h1>
             <p className="mt-2 text-sm leading-6 text-muted">
               Use the account issued by the Dispatch Management Section.
             </p>
@@ -244,7 +189,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((value) => !value)}
-                    className="absolute right-2 top-2 rounded px-2 py-1 text-[11px] font-medium text-muted transition-colors hover:bg-canvas hover:text-ink"
+                    className="absolute right-1.5 top-0.5 min-h-11 rounded px-2 text-xs font-medium text-muted transition-colors hover:bg-canvas hover:text-ink"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? "Hide" : "Show"}
@@ -273,9 +218,6 @@ export default function LoginPage() {
             <p className="mt-6 border-t border-line pt-5 text-[11px] leading-5 text-muted">
               Having trouble signing in? Contact your training administrator or the DMS system administrator.
             </p>
-          </div>
-        </section>
-      </div>
-    </main>
+    </AuthLayout>
   );
 }
