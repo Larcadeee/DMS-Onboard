@@ -216,6 +216,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/users/{user}', [UserController::class, 'update']);
             Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
             Route::post('/users/{user}/photo', [\App\Http\Controllers\Api\ProfileController::class, 'updateUserPhoto']);
+            Route::delete('/users/{user}/photo', [\App\Http\Controllers\Api\ProfileController::class, 'destroyUserPhoto']);
         });
         Route::middleware('permission:users.approve')->group(function () {
             Route::post('/users/{user}/approve', [UserController::class, 'approve']);

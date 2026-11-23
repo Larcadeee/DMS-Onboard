@@ -13,6 +13,36 @@ export function cn(...values: Array<string | false | null | undefined>): string 
   return values.filter(Boolean).join(" ");
 }
 
+export function ActionIcon({
+  name,
+  className = "h-4 w-4",
+}: {
+  name: "view" | "add" | "edit" | "delete" | "approve" | "manage" | "download" | "upload" | "refresh" | "settings" | "close" | "search" | "shield";
+  className?: string;
+}) {
+  const paths: Record<typeof name, ReactNode> = {
+    view: <><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" /><circle cx="12" cy="12" r="2.5" /></>,
+    add: <><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></>,
+    edit: <><path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Z" /><path d="m13.5 6.5 4 4" /></>,
+    delete: <><path d="M4 7h16M9 7V4h6v3M6.5 7l1 13h9l1-13M10 11v5M14 11v5" /></>,
+    approve: <><circle cx="12" cy="12" r="9" /><path d="m7.5 12 3 3 6-6" /></>,
+    manage: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-2.8-2.8.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></>,
+    download: <><path d="M12 3v12M7 10l5 5 5-5M4 20h16" /></>,
+    upload: <><path d="M12 15V3M7 8l5-5 5 5M4 20h16" /></>,
+    refresh: <><path d="M20 6v5h-5M4 18v-5h5" /><path d="M18.5 9A7 7 0 0 0 6 6.5L4 11M5.5 15A7 7 0 0 0 18 17.5l2-4.5" /></>,
+    settings: <><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.2 2.2M16.9 16.9l2.2 2.2M19.1 4.9l-2.2 2.2M7.1 16.9l-2.2 2.2" /></>,
+    close: <path d="M5 5l14 14M19 5 5 19" />,
+    search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></>,
+    shield: <><path d="M12 3 20 6v5c0 5-3.5 8.4-8 10-4.5-1.6-8-5-8-10V6l8-3Z" /><path d="m8.5 12 2.2 2.2 4.8-4.7" /></>,
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" className={cn("shrink-0", className)} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths[name]}
+    </svg>
+  );
+}
+
 export function Spinner({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 20 20" className={cn("h-4 w-4 animate-spin", className)} fill="none" aria-hidden="true">
@@ -64,7 +94,6 @@ export function PageHeader({
   title,
   description,
   actions,
-  breadcrumb,
 }: {
   title: string;
   description?: string;
@@ -74,12 +103,6 @@ export function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        {breadcrumb && (
-          <p className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">
-            <span className="h-px w-4 bg-brand" aria-hidden="true" />
-            {breadcrumb}
-          </p>
-        )}
         <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">{title}</h1>
         {description && <p className="mt-1.5 max-w-3xl text-sm leading-6 text-muted">{description}</p>}
       </div>
@@ -102,7 +125,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section className={cn("content-enter rounded-lg border border-line bg-surface", className)}>
+    <section className={cn("content-enter rounded-lg border border-line bg-white", className)}>
       {(title || actions) && (
         <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
           <div className="min-w-0">

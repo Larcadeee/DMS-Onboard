@@ -6,7 +6,7 @@ import { api } from "@/lib/api/client";
 import { useApi } from "@/lib/hooks";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/lib/auth";
-import { Badge, Button, Card, ErrorState, Field, Input, Modal, PageHeader, PageLoading, SectionTitle, Textarea } from "@/components/ui/Primitives";
+import { ActionIcon, Badge, Button, Card, ErrorState, Field, Input, Modal, PageHeader, PageLoading, SectionTitle, Textarea } from "@/components/ui/Primitives";
 
 interface Permission { id: number; name: string; slug: string; module?: string; description?: string }
 interface Role {
@@ -17,6 +17,25 @@ interface Role {
   is_active: boolean;
   users_count?: number;
   permissions: Permission[];
+}
+
+function permissionIcon(permission: Permission): "view" | "add" | "edit" | "delete" | "approve" | "manage" | "download" | "settings" | "shield" {
+  const value = `${permission.slug} ${permission.name}`.toLowerCase();
+  if (value.includes("delete") || value.includes("remove") || value.includes("archive")) return "delete";
+  if (value.includes("approve") || value.includes("validate")) return "approve";
+  if (value.includes("export") || value.includes("download")) return "download";
+  if (value.includes("create") || value.includes("add")) return "add";
+  if (value.includes("update") || value.includes("edit")) return "edit";
+  if (value.includes("manage") || value.includes("configure")) return "settings";
+  if (value.includes("view") || value.includes("read")) return "view";
+  return "shield";
+}
+
+function roleIcon(slug: string): "shield" | "manage" | "approve" | "view" {
+  if (slug.includes("admin") || slug.includes("section")) return "manage";
+  if (slug.includes("supervisor") || slug.includes("trainer")) return "approve";
+  if (slug.includes("trainee")) return "view";
+  return "shield";
 }
 
 export default function RolesPage() {
@@ -113,7 +132,7 @@ export default function RolesPage() {
           title="Roles &amp; Permissions"
           description="Control module access for each role. Changes apply to users immediately."
           breadcrumb="Administration"
-          actions={can("roles.manage") ? <Button onClick={() => setOpen(true)}>Add Role</Button> : undefined}
+          actions={can("roles.manage") ? <Button onClick={() => setOpen(true)}><ActionIcon name="add" />Add role</Button> : undefined}
         />
 
         {loading && <PageLoading label="Loading roles and permissions" />}
@@ -129,10 +148,15 @@ export default function RolesPage() {
                   key={role.id}
                   type="button"
                   onClick={() => setSelectedId(role.id)}
-                  className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${selected?.id === role.id ? "bg-ink text-white" : "hover:bg-canvas"}`}
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition-colors ${selected?.id === role.id ? "bg-ink text-white" : "hover:bg-canvas"}`}
                 >
-                  <span className="block font-medium">{role.name}</span>
-                  <span className={`text-[11px] ${selected?.id === role.id ? "text-white/60" : "text-muted"}`}>{role.users_count ?? 0} user{(role.users_count ?? 0) === 1 ? "" : "s"}</span>
+                  <span className={selected?.id === role.id ? "text-brand" : "text-muted"} title={`${role.name} role`}>
+                    <ActionIcon name={roleIcon(role.slug)} className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{role.name}</span>
+                    <span className={`block text-[11px] ${selected?.id === role.id ? "text-white/60" : "text-muted"}`}>{role.users_count ?? 0} user{(role.users_count ?? 0) === 1 ? "" : "s"}</span>
+                  </span>
                 </button>
               ))}
             </div>
@@ -156,12 +180,15 @@ export default function RolesPage() {
                     </div>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {permissions.map((permission) => (
-                        <label key={permission.id} className="flex items-start gap-2 rounded-lg border p-3 text-sm hover:bg-slate-50">
-                          <input type="checkbox" className="mt-0.5" checked={checked.has(permission.id)} onChange={() => toggle(permission.id)} />
-                          <span>
+                        <label key={permission.id} className={`flex items-start gap-3 rounded-lg border p-3 text-sm transition-colors ${checked.has(permission.id) ? "border-brand/30 bg-brand-soft" : "bg-white hover:bg-canvas"}`}>
+                          <span className={checked.has(permission.id) ? "text-brand-dark" : "text-muted"} title={checked.has(permission.id) ? "Permission granted" : "Permission restricted"}>
+                            <ActionIcon name={permissionIcon(permission)} className="h-5 w-5" />
+                          </span>
+                          <span className="min-w-0 flex-1">
                             <span className="block font-medium text-slate-800">{permission.name}</span>
                             <span className="font-mono text-xs text-slate-400">{permission.slug}</span>
                           </span>
+                          <input type="checkbox" className="mt-1 accent-[var(--brand)]" checked={checked.has(permission.id)} onChange={() => toggle(permission.id)} aria-label={`${checked.has(permission.id) ? "Disable" : "Enable"} ${permission.name}`} />
                         </label>
                       ))}
                     </div>

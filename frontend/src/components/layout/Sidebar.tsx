@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/components/ui/Primitives";
+import { Avatar } from "@/components/ui/Avatar";
 
 interface NavItem {
   name: string;
@@ -313,8 +314,14 @@ export default function Sidebar({
           })}
         </nav>
 
-        <div className="border-t border-white/10 p-2.5">
-          <p className={cn("px-2 pt-1 text-[10px] text-white/30", collapsed && "lg:hidden")}>Butuan City CDRRMD</p>
+        <div className={cn("border-t border-white/10 p-2.5", collapsed && "lg:px-2")}>
+          <div className={cn("flex items-center gap-2.5 px-1 py-1", collapsed && "lg:justify-center lg:px-0")}>
+            <Avatar src={user?.avatar_url} name={user?.name} size="sm" />
+            <div className={cn("min-w-0", collapsed && "lg:hidden")}>
+              <p className="truncate text-[12px] font-medium text-white">{user?.name ?? "User"}</p>
+              <p className="truncate text-[10px] text-white/45">{user?.role?.name ?? "CDRRMD"}</p>
+            </div>
+          </div>
         </div>
       </aside>
     </>

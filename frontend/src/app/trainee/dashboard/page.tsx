@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useApi } from "@/lib/hooks";
 import { formatDate, formatDateTime, titleCase } from "@/lib/format";
 import { Badge, Card, EmptyState, ErrorState, PageHeader, PageLoading, ProgressBar } from "@/components/ui/Primitives";
+import { DistributionChart } from "@/components/ui/DistributionChart";
 
 interface PortalDashboard {
   trainee: { first_name: string; last_name: string; trainee_number: string };
@@ -69,7 +70,21 @@ export default function TraineeDashboardPage() {
             </section>
 
             <Card title="Onboarding Progress" description={data.progress.current_phase ? `Current phase: ${data.progress.current_phase}` : undefined}>
-              <ProgressBar value={data.progress.progress} />
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px]">
+                <DistributionChart
+                  type="bar"
+                  data={[
+                    { label: "Modules", value: data.progress.modules_completed },
+                    { label: "Assessments passed", value: data.progress.assessments_passed },
+                    { label: "Competencies validated", value: data.progress.competencies_validated },
+                  ]}
+                />
+                <div className="rounded-lg border border-line px-4 py-5">
+                  <p className="text-xs font-medium text-muted">Overall progress</p>
+                  <p className="mt-2 text-3xl font-semibold tabular-nums text-ink">{Math.round(data.progress.progress)}%</p>
+                  <ProgressBar value={data.progress.progress} />
+                </div>
+              </div>
               {data.progress.outstanding.length > 0 ? (
                 <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
                   <p className="text-sm font-medium text-amber-800">Outstanding requirements</p>

@@ -11,8 +11,8 @@ import { formatDateTime, type AuthUser } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge, Button, Card, DetailRow, ErrorState, Field, Input, PageHeader, PageLoading, StatCard } from "@/components/ui/Primitives";
 
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 interface ProfileUser extends AuthUser {
   role: { id: number; name: string; slug: string } | null;
@@ -71,12 +71,12 @@ export default function ProfilePage() {
     }
 
     if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
-      setFormError("Profile photos must be a JPG, JPEG, or PNG image.");
+      setFormError("Profile photos must be a JPG, JPEG, PNG, or WebP image.");
       return;
     }
 
     if (file.size > MAX_PHOTO_BYTES) {
-      setFormError("Profile photos must be 5 MB or smaller.");
+      setFormError("Profile photos must be 2 MB or smaller.");
       return;
     }
 
@@ -160,13 +160,13 @@ export default function ProfilePage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <Card title="Profile Photo" description="JPG, JPEG or PNG · maximum 5 MB.">
+              <Card title="Profile Photo" description="JPG, JPEG, PNG or WebP · maximum 2 MB.">
                 <div className="flex flex-col items-center gap-3 text-center">
                   <Avatar src={preview ?? profile.avatar_url} name={displayName} size="lg" />
                   <input
                     ref={fileInput}
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
                     className="hidden"
                     onChange={(e) => choosePhoto(e.target.files?.[0])}
                   />

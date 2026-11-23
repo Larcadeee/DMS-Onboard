@@ -8,7 +8,7 @@ import { useApi, useDebounced } from "@/lib/hooks";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { formatDateTime } from "@/lib/format";
-import { Badge, Button, Card, Field, Input, Modal, PageHeader, Pagination, SearchInput, Select, Textarea } from "@/components/ui/Primitives";
+import { ActionIcon, Badge, Button, Card, Field, Input, Modal, PageHeader, Pagination, SearchInput, Select, Textarea } from "@/components/ui/Primitives";
 import { DataTable } from "@/components/ui/DataTable";
 import { Avatar } from "@/components/ui/Avatar";
 
@@ -39,8 +39,8 @@ interface Role { id: number; name: string; slug: string }
 type PendingAction = "reject" | "deactivate" | "delete" | null;
 
 const blank = { first_name: "", middle_name: "", last_name: "", contact_number: "", email: "", role_id: "", password: "", password_confirmation: "" };
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const STATUS_LABEL: Record<AccountStatus, string> = {
   PENDING: "Pending",
@@ -76,6 +76,7 @@ export default function UsersPage() {
   const [resetting, setResetting] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [removingPhoto, setRemovingPhoto] = useState(false);
 
   const [confirmFor, setConfirmFor] = useState<UserRow | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
@@ -134,18 +135,39 @@ export default function UsersPage() {
     }
 
     if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
-      setError("Profile photos must be a JPG, JPEG, or PNG image.");
+      setError("Profile photos must be a JPG, JPEG, PNG, or WebP image.");
       return;
     }
 
     if (file.size > MAX_PHOTO_BYTES) {
-      setError("Profile photos must be 5 MB or smaller.");
+      setError("Profile photos must be 2 MB or smaller.");
       return;
     }
 
     setError("");
     setPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
+  }
+
+  async function removePhoto() {
+    if (!editing) return;
+    if (!window.confirm("Remove this user's profile photo?")) return;
+
+    setRemovingPhoto(true);
+    setError("");
+
+    try {
+      await api.delete<{ user: UserRow }>(`/api/v1/users/${editing.id}/photo`);
+      setEditing({ ...editing, avatar_url: null });
+      setPhoto(null);
+      setPhotoPreview(null);
+      toast.notify("Profile photo removed.");
+      await list.refetch();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to remove profile photo.");
+    } finally {
+      setRemovingPhoto(false);
+    }
   }
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
@@ -290,7 +312,7 @@ export default function UsersPage() {
           title="User Account Management"
           description="Review registrations, manage access and maintain staff accounts."
           breadcrumb="Administration"
-          actions={can("users.create") ? <Button onClick={openCreate}>Add User</Button> : undefined}
+          actions={can("users.create") ? <Button onClick={openCreate}><ActionIcon name="add" />Add user</Button> : undefined}
         />
 
         {can("users.approve") && pendingCount > 0 && (
@@ -383,12 +405,12 @@ export default function UsersPage() {
                     <div className="flex flex-wrap gap-1">
                       {isPending && can("users.approve") && (
                         <>
-                          <Button size="sm" onClick={() => runStatusAction(row, "approve")}>Approve</Button>
-                          <Button size="sm" variant="ghost" onClick={() => openConfirm(row, "reject")}>Reject</Button>
+                          <Button size="sm" onClick={() => runStatusAction(row, "approve")} title="Approve registration"><ActionIcon name="approve" />Approve</Button>
+                          <Button size="sm" variant="ghost" onClick={() => openConfirm(row, "reject")} title="Reject registration"><ActionIcon name="delete" />Reject</Button>
                         </>
                       )}
                       {!isPending && can("users.update") && (
-                        <Button size="sm" variant="ghost" onClick={() => openEdit(row)}>Edit</Button>
+                        <Button size="sm" variant="ghost" onClick={() => openEdit(row)} title="Edit user"><ActionIcon name="edit" />Edit</Button>
                       )}
                       {!isPending && can("users.update") && (
                         <Button size="sm" variant="ghost" onClick={() => { setResetFor(row); setResetError(""); }}>Reset Password</Button>
@@ -400,7 +422,7 @@ export default function UsersPage() {
                         <Button size="sm" variant="ghost" onClick={() => openConfirm(row, "deactivate")}>Deactivate</Button>
                       )}
                       {!isSelf && can("users.delete") && (
-                        <Button size="sm" variant="ghost" onClick={() => openConfirm(row, "delete")}>Delete</Button>
+                        <Button size="sm" variant="ghost" onClick={() => openConfirm(row, "delete")} title="Delete user"><ActionIcon name="delete" />Delete</Button>
                       )}
                     </div>
                   );
@@ -425,8 +447,18 @@ export default function UsersPage() {
           <div className="sm:col-span-2 flex flex-wrap items-center gap-3 rounded-lg border p-3">
             <Avatar src={photoPreview ?? editing?.avatar_url} name={[form.first_name, form.last_name].filter(Boolean).join(" ") || editing?.name} size="md" />
             <div>
-              <Input type="file" accept="image/jpeg,image/jpg,image/png" onChange={(e) => choosePhoto(e.target.files?.[0])} className="text-xs" />
-              <p className="mt-1 text-xs text-slate-400">Optional. JPG, JPEG or PNG, maximum 5 MB.</p>
+              <Input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={(e) => choosePhoto(e.target.files?.[0])} className="text-xs" />
+              <p className="mt-1 text-xs text-slate-400">Optional. JPG, JPEG, PNG or WebP, maximum 2 MB.</p>
+              {editing?.avatar_url && !photo && (
+                <Button type="button" variant="ghost" size="sm" className="mt-2 text-red-600" onClick={removePhoto} loading={removingPhoto}>
+                  Remove current photo
+                </Button>
+              )}
+              {photo && (
+                <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => { setPhoto(null); setPhotoPreview(null); }}>
+                  Cancel selection
+                </Button>
+              )}
             </div>
           </div>
           <Field label="First Name" required><Input required maxLength={100} value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} /></Field>
