@@ -27,12 +27,12 @@ The application combines a Next.js administrative and trainee portal with a Lara
 
 Install the following tools before setup:
 
-- PHP 8.3 or newer
+- PHP 8.4.1 or newer
 - Composer
 - Node.js and npm
 - SQLite support for PHP
 
-The backend declares Laravel 13.17 or newer within the Laravel 13 release and Laravel Sanctum 4.
+The backend requires PHP 8.4.1 or newer, Laravel 13.17 or newer within the Laravel 13 release, and Laravel Sanctum 4.
 
 ## Installation and Getting Started
 
@@ -123,6 +123,17 @@ composer run setup
 ```
 
 This installs Composer dependencies, creates `.env` from `.env.example` if missing, generates the application key, runs migrations, installs backend npm dependencies, and builds backend assets. It does not create `database/database.sqlite`; create that file first when it does not already exist.
+
+## Deploying the frontend to Vercel
+
+This repository keeps the Next.js app in `frontend/`, so Vercel must use that folder as the project root:
+
+1. In Vercel, create or open the project connected to this repository.
+2. Go to **Settings → Build and Deployment** and set **Root Directory** to `frontend`. Save the setting.
+3. Keep the framework preset set to **Next.js** (or let Vercel detect it), and use the default install and build commands.
+4. Redeploy.
+
+The `package.json` and lockfile Vercel needs are in `frontend/`; deploying with the repository root as the project root causes the “Failed to locate `package.json`” error. The Laravel backend is a separate application and must be deployed and configured separately. For a deployed frontend, configure `API_PROXY_TARGET` in the Vercel project's environment variables to point to the reachable Laravel API, and configure Laravel's production session, Sanctum, and CORS settings for the deployed frontend origin.
 
 ## Usage
 
