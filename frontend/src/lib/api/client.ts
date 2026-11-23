@@ -1,5 +1,9 @@
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+
+function apiUrl(path: string): string {
+  return `${API_URL}/${path.replace(/^\/+/, "")}`;
+}
 
 export interface Paginated<T> {
   current_page: number;
@@ -33,7 +37,7 @@ function getXsrfToken(): string | undefined {
 }
 
 export async function initializeCsrf(signal?: AbortSignal): Promise<void> {
-  const response = await fetch(`${API_URL}/sanctum/csrf-cookie`, {
+  const response = await fetch(apiUrl("/sanctum/csrf-cookie"), {
     method: "GET",
     credentials: "include",
     signal,
@@ -69,13 +73,13 @@ export async function apiRequest(
   endpoint: string,
   options: RequestInit = {}
 ) {
-  let response = await fetch(`${API_URL}${endpoint}`, requestOptions(options));
+  let response = await fetch(apiUrl(endpoint), requestOptions(options));
 
   // A 419 means the CSRF token expired. Refresh it once and retry the request
   // so expired sessions/logins fail cleanly instead of blocking the user.
   if (response.status === 419) {
     await initializeCsrf(options.signal ?? undefined).catch(() => undefined);
-    response = await fetch(`${API_URL}${endpoint}`, requestOptions(options));
+    response = await fetch(apiUrl(endpoint), requestOptions(options));
   }
 
   const data = await response.json().catch(() => ({}));
@@ -126,7 +130,7 @@ export const api = {
 };
 
 export async function downloadFile(endpoint: string, filename: string): Promise<void> {
-  const response = await fetch(`${API_URL}${endpoint}`, { credentials: "include" });
+  const response = await fetch(apiUrl(endpoint), { credentials: "include" });
 
   if (!response.ok) {
     throw new ApiError("Unable to download file.", response.status);
