@@ -133,7 +133,7 @@ This repository keeps the Next.js app in `frontend/`, so Vercel must use that fo
 3. Keep the framework preset set to **Next.js** (or let Vercel detect it), and use the default install and build commands.
 4. Redeploy.
 
-The `package.json` and lockfile Vercel needs are in `frontend/`; deploying with the repository root as the project root causes the “Failed to locate `package.json`” error. The Laravel backend is a separate application and must be deployed and configured separately. For a deployed frontend, configure `API_PROXY_TARGET` in the Vercel project's environment variables to point to the reachable Laravel API, and configure Laravel's production session, Sanctum, and CORS settings for the deployed frontend origin.
+The `package.json` and lockfile Vercel needs are in `frontend/`; deploying with the repository root as the project root causes the “Failed to locate `package.json`” error. The Laravel backend is a separate application and must be deployed and configured separately. For a deployed frontend, configure `API_PROXY_TARGET` in the Vercel project's environment variables to point to the reachable Laravel API, and configure Laravel's production session and Sanctum settings. Set the backend's `FRONTEND_URL` to the frontend's full origin (for example, `https://your-project.vercel.app`) if the browser calls the API cross-origin. The backend CORS config allows that origin and credentials.
 
 ## Usage
 
