@@ -23,6 +23,7 @@ class ProfileTest extends TestCase
         return User::factory()->create(array_merge([
             'role_id' => $role->id,
             'is_active' => true,
+            'must_change_password' => false,
         ], $attributes));
     }
 

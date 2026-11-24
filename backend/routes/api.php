@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum',
         'active',
         \Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
+        \App\Http\Middleware\RequirePasswordChange::class,
     ])->group(function () {
 
         Route::get('/user', [AuthController::class, 'me']);

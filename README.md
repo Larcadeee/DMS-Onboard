@@ -62,6 +62,8 @@ SESSION_SECURE_COOKIE=false
 SESSION_SAME_SITE=lax
 ```
 
+For production, set `SESSION_SECURE_COOKIE=true`. If this variable is omitted, Laravel now enables secure session cookies automatically when `APP_ENV=production`; the local example keeps them non-secure for local HTTP development.
+
 `GOOGLE_CLIENT_ID` is optional. To enable Google Sign-In, set the same Google OAuth client ID in both environments:
 
 ```dotenv
@@ -111,7 +113,7 @@ API_PROXY_TARGET=http://127.0.0.1:8000
 API_SESSION_COOKIE=cdrrmd-session
 ```
 
-If `NEXT_PUBLIC_API_URL` is set, it must point to a URL that is correctly configured for session cookies and Sanctum CSRF. `API_PROXY_TARGET` and `API_SESSION_COOKIE` must match the Laravel server and the `SESSION_COOKIE` value in `backend/.env`.
+For Vercel, leave `NEXT_PUBLIC_API_URL` unset to use the same-origin rewrites. Set `API_PROXY_TARGET` to the backend's **public** HTTPS URL (for example, `https://dms-onboard-production.up.railway.app`, without `/api` or a trailing slash). Do not use a Railway private-network hostname: Vercel cannot resolve Railway's private DNS. Set `API_SESSION_COOKIE` to the exact cookie name emitted by Laravel's `SESSION_COOKIE` setting. The deployed backend currently emits `dms-onboard-session`; the local example uses `cdrrmd-session`.
 
 ### Optional Composer setup command
 
@@ -133,7 +135,7 @@ This repository keeps the Next.js app in `frontend/`, so Vercel must use that fo
 3. Keep the framework preset set to **Next.js** (or let Vercel detect it), and use the default install and build commands.
 4. Redeploy.
 
-The `package.json` and lockfile Vercel needs are in `frontend/`; deploying with the repository root as the project root causes the “Failed to locate `package.json`” error. The Laravel backend is a separate application and must be deployed and configured separately. For a deployed frontend, configure `API_PROXY_TARGET` in the Vercel project's environment variables to point to the reachable Laravel API, and configure Laravel's production session and Sanctum settings. Set the backend's `FRONTEND_URL` to the frontend's full origin (for example, `https://your-project.vercel.app`) if the browser calls the API cross-origin. The backend CORS config allows that origin and credentials.
+The `package.json` and lockfile Vercel needs are in `frontend/`; deploying with the repository root as the project root causes the “Failed to locate `package.json`” error. The Laravel backend is a separate application and must be deployed and configured separately. In Vercel's **Production** environment variables, set `API_PROXY_TARGET=https://dms-onboard-production.up.railway.app` and `API_SESSION_COOKIE=dms-onboard-session`, leave `NEXT_PUBLIC_API_URL` unset, then redeploy. The API target must be Railway's public domain, not its private-network hostname; an unset target falls back to `http://127.0.0.1:8000`, which is not reachable from Vercel. Same-origin rewrites avoid browser CORS. If the browser calls the Railway API directly instead, configure the backend's `FRONTEND_URL` to the frontend's full origin and account for cross-site cookie requirements.
 
 ## Usage
 
